@@ -1,0 +1,177 @@
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+:root {
+  /* Cute Pastel Color Palette */
+  --color-primary: #FF8FAB;        /* Soft pink */
+  --color-primary-light: #FFB3C6;
+  --color-primary-dark: #E8527A;
+  
+  --color-secondary: #FFC97E;      /* Warm peach/orange */
+  --color-secondary-light: #FFE0A0;
+  --color-secondary-dark: #E5A050;
+
+  --color-accent: #A8D8EA;         /* Sky blue */
+  --color-accent-light: #C8EAF5;
+
+  --color-mint: #B5EAD7;           /* Mint green */
+  --color-lavender: #C9B1FF;       /* Lavender */
+  --color-yellow: #FFEAA7;         /* Soft yellow */
+  
+  --color-bg-main: #FFF9F0;        /* Warm cream */
+  --color-bg-card: #FFFFFF;
+  --color-bg-header: #FFF0F5;
+  
+  --color-text-main: #3D2B1F;
+  --color-text-muted: #9B8B80;
+  --color-text-inverse: #FFFFFF;
+  
+  --color-danger: #FF6B6B;
+  --color-urgent: #FF4757;
+  
+  --shadow-sm: 0 2px 8px rgba(255, 143, 171, 0.15);
+  --shadow-md: 0 4px 16px rgba(255, 143, 171, 0.2);
+  --shadow-lg: 0 8px 32px rgba(255, 143, 171, 0.25);
+  
+  --radius-sm: 8px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+  --radius-full: 9999px;
+
+  --font-family: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, system-ui, 'Apple SD Gothic Neo', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  font-family: var(--font-family);
+  background-color: var(--color-bg-main);
+  color: var(--color-text-main);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* BOARD_MODE: fullscreen display */
+.board-mode-root {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* Override for board mode - larger text */
+.board-mode-root * {
+  font-size: inherit;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-2px);
+}
+
+button:active {
+  transform: scale(0.96) translateY(0);
+}
+
+/* Cute Card */
+.cute-card {
+  background: var(--color-bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 2px solid rgba(255, 179, 198, 0.3);
+}
+
+/* Glass panel for board */
+.glass-panel {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  box-shadow: var(--shadow-md);
+}
+
+/* Urgent blink */
+@keyframes urgentBlink {
+  0%, 100% { border-color: var(--color-urgent); box-shadow: 0 0 0 0 rgba(255,71,87,0.4); }
+  50% { border-color: transparent; box-shadow: 0 0 20px 10px rgba(255,71,87,0); }
+}
+
+.urgent-blink {
+  animation: urgentBlink 1.2s ease-in-out 2;
+}
+
+/* Egg hatching animation */
+@keyframes eggShake {
+  0%, 100% { transform: rotate(0deg); }
+  20% { transform: rotate(-5deg); }
+  40% { transform: rotate(5deg); }
+  60% { transform: rotate(-3deg); }
+  80% { transform: rotate(3deg); }
+}
+
+@keyframes chickPop {
+  0% { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60% { transform: scale(1.2) rotate(5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes eggCrack {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.9) rotate(10deg); }
+  100% { transform: scale(0) rotate(180deg); opacity: 0; }
+}
+
+.egg-shake {
+  animation: eggShake 0.4s ease-in-out;
+}
+
+.chick-pop {
+  animation: chickPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+/* Pulse animation */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Floating animation */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+.float-anim {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* Scrollbar cute style */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FFE0E9;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
