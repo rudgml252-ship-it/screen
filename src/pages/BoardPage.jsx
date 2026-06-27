@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMockDb } from '../context/MockDbContext';
+import TeacherAvatar from '../components/TeacherAvatar';
 import styles from './BoardPage.module.css';
 
 /* ── helpers ── */
@@ -235,12 +236,11 @@ export default function BoardPage() {
   return (
     <div className={`board-mode-root ${styles.board}`}>
 
-      {/* ── 귀여운 CSS 배경 ── */}
+      {/* ── 배경 ── */}
       <div className={styles.bgBase} />
-      <div className={styles.bgBubbles}>
-        <span /><span /><span /><span /><span />
-        <span /><span /><span /><span /><span />
-      </div>
+
+      {/* ── 선생님 픽셀 아바타 ── */}
+      <TeacherAvatar />
 
       {/* ══ 헤더 ══ */}
       <header className={styles.header}>
