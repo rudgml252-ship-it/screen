@@ -11,9 +11,9 @@ const getDday = (targetDate) => {
 };
 const TYPE_CONFIG = {
   URGENT:  { label:'🚨 긴급', bg:'#FF4757', text:'#fff' },
-  GENERAL: { label:'📢 일반', bg:'#80DEEA', text:'#006064' },
+  GENERAL: { label:'📢 일반', bg:'#FFBD9B', text:'#A0400A' },
   SUBMIT:  { label:'📝 제출', bg:'#FFEAA7', text:'#7B6000' },
-  SCHEDULE:{ label:'📅 시간표', bg:'#B2EBF2', text:'#00838F' },
+  SCHEDULE:{ label:'📅 시간표', bg:'#FFCCB3', text:'#C04E2E' },
 };
 
 /* ── Rich Education Card ── */
@@ -29,7 +29,7 @@ function EduCard({ data }) {
   }
   return (
     <div className={styles.eduCardRich}>
-      <div className={styles.eduRichHeader} style={{ background: data.headerBg || '#26C6DA' }}>
+      <div className={styles.eduRichHeader} style={{ background: data.headerBg || '#E8654A' }}>
         <span className={styles.eduRichEmoji}>{data.mainEmoji}</span>
         <div className={styles.eduRichHeaderText}>
           <div className={styles.eduRichTitle}>{data.title}</div>
@@ -236,7 +236,7 @@ export default function BoardPage() {
           {sortedDdays.slice(0, 5).map(d => (
             <div key={d.id} className={styles.ddayRow}>
               <span className={styles.ddayTitle}>{d.title}</span>
-              <span className={styles.ddayNum} style={{ color: d.diff < 0 ? '#78909C' : d.diff <= 3 ? '#FF4757' : '#006064' }}>
+              <span className={styles.ddayNum} style={{ color: d.diff < 0 ? '#A0896B' : d.diff <= 3 ? '#FF4757' : '#C04E2E' }}>
                 {d.diff < 0 ? `D+${Math.abs(d.diff)}` : d.diff === 0 ? 'D-Day' : `D-${d.diff}`}
               </span>
             </div>
