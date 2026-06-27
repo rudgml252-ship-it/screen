@@ -16,87 +16,140 @@ const NAGS = [
   '🎒 가방 정리 잘 했죠?',
 ];
 
-const P  = 4;      // px per pixel unit
-const CW = 10 * P; // 40px
-const CH = 13 * P; // 52px
-
+// Pixel size — element is P×P so shadow spread is 0
+const P  = 5;
 const __ = null;
-const HR = '#3B1A10';
-const HP = '#C4608A';
-const SK = '#F5C5A3';
-const EY = '#180805';
-const BL = '#E87090';
-const PU = '#7050B8';
-const WH = '#F8F8F8';
-const SH = '#3D2810';
+const BK = '#101018'; // outline
+const PK = '#F9A0B8'; // kirby pink
+const CP = '#E06080'; // cheek blush
+const RD = '#C01858'; // feet / mouth
+const WH = '#FFFFFF'; // eye white
 
 const toShadow = (grid) => {
   const s = [];
   grid.forEach((row, y) => row.forEach((c, x) => {
-    if (c) s.push(`${x * P}px ${y * P}px 0 ${P - 1}px ${c}`);
+    if (c) s.push(`${x * P}px ${y * P}px 0 0 ${c}`);
   }));
   return s.join(',');
 };
 
-/* ── Front ── */
+/* ────────────────── SPRITES (12 wide × 12 tall) ────────────────── */
+
+// Front body rows 0-7
 const FB = [
-  [__,__,HR,HR,HR,HR,HR,HR,__,__],
-  [__,HR,HP,HP,HP,HP,HP,HP,HR,__],
-  [__,HR,SK,SK,SK,SK,SK,SK,HR,__],
-  [__,__,SK,EY,SK,SK,EY,SK,__,__],
-  [__,__,SK,SK,SK,SK,SK,SK,__,__],
-  [__,__,SK,WH,WH,WH,WH,SK,__,__],
-  [__,BL,BL,BL,BL,BL,BL,BL,BL,__],
-  [SK,BL,BL,BL,BL,BL,BL,BL,BL,SK],
-  [__,BL,BL,BL,BL,BL,BL,BL,BL,__],
-  [__,PU,PU,PU,PU,PU,PU,PU,PU,__],
-  [__,PU,PU,PU,PU,PU,PU,PU,PU,__],
+  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,PK,BK,BK,PK,PK,BK,BK,PK,BK,__],
+  [BK,PK,BK,WH,BK,PK,PK,BK,WH,BK,PK,BK],
+  [BK,PK,PK,BK,BK,PK,PK,BK,BK,PK,PK,BK],
+  [BK,PK,CP,PK,PK,PK,PK,PK,CP,PK,PK,BK],
+  [BK,PK,PK,PK,BK,BK,PK,PK,PK,PK,PK,BK],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
 ];
-const F0 = [...FB, [__,__,WH,WH,__,__,WH,WH,__,__],[__,__,SH,SH,__,__,SH,SH,__,__]];
-const F1 = [...FB, [__,WH,WH,__,__,__,__,WH,__,__],[__,SH,SH,__,__,__,__,__,SH,__]];
-const F2 = [...FB, [__,__,WH,__,__,__,WH,WH,__,__],[__,SH,__,__,__,__,SH,SH,__,__]];
+// Front mouth-open rows 0-7
+const FT = [
+  ...FB.slice(0, 5),
+  [BK,PK,CP,PK,PK,PK,PK,PK,CP,PK,PK,BK],
+  [BK,PK,PK,BK,BK,BK,BK,BK,PK,PK,PK,BK],
+  [BK,PK,RD,RD,RD,RD,RD,RD,PK,PK,PK,BK],
+];
 
-/* ── Back ── */
+// Back body rows 0-7
 const BB = [
-  [__,__,HR,HR,HR,HR,HR,HR,__,__],
-  [__,HR,HR,HR,HR,HR,HR,HR,HR,__],
-  [__,HR,HP,HP,HP,HP,HP,HP,HR,__],
-  [__,HR,HR,HR,HR,HR,HR,HR,HR,__],
-  [__,__,SK,SK,SK,SK,SK,SK,__,__],
-  [__,__,SK,SK,SK,SK,SK,SK,__,__],
-  [__,BL,BL,BL,BL,BL,BL,BL,BL,__],
-  [SK,BL,BL,BL,BL,BL,BL,BL,BL,SK],
-  [__,BL,BL,BL,BL,BL,BL,BL,BL,__],
-  [__,PU,PU,PU,PU,PU,PU,PU,PU,__],
-  [__,PU,PU,PU,PU,PU,PU,PU,PU,__],
+  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
 ];
-const B0 = [...BB, [__,__,WH,WH,__,__,WH,WH,__,__],[__,__,SH,SH,__,__,SH,SH,__,__]];
-const B1 = [...BB, [__,WH,WH,__,__,__,__,WH,__,__],[__,SH,SH,__,__,__,__,__,SH,__]];
-const B2 = [...BB, [__,__,WH,__,__,__,WH,WH,__,__],[__,SH,__,__,__,__,SH,SH,__,__]];
 
-/* ── Left (right = CSS scaleX(-1)) ── */
+// Left body rows 0-7 (right = CSS scaleX(-1) of left)
 const LB = [
-  [__,__,HR,HR,HR,HR,__,__,__,__],
-  [__,HR,HP,HP,HP,HP,HR,__,__,__],
-  [__,HR,SK,SK,SK,SK,HR,__,__,__],
-  [__,__,SK,EY,SK,SK,__,__,__,__],
-  [__,__,SK,SK,SK,SK,__,__,__,__],
-  [__,__,SK,WH,SK,__,__,__,__,__],
-  [__,BL,BL,BL,BL,BL,__,__,__,__],
-  [__,BL,BL,BL,BL,BL,SK,__,__,__],
-  [__,BL,BL,BL,BL,BL,__,__,__,__],
-  [__,PU,PU,PU,PU,PU,__,__,__,__],
-  [__,PU,PU,PU,PU,PU,__,__,__,__],
+  [__,__,BK,BK,BK,BK,BK,BK,__,__,__,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,BK,__,__,__],
+  [BK,PK,PK,BK,BK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,BK,WH,BK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,BK,BK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,CP,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,PK,BK,PK,PK,PK,PK,BK,__,__,__],
+  [__,BK,PK,PK,PK,PK,PK,BK,__,__,__,__],
 ];
-const L0 = [...LB, [__,__,WH,WH,__,__,__,__,__,__],[__,__,SH,SH,__,__,__,__,__,__]];
-const L1 = [...LB, [__,WH,WH,__,WH,__,__,__,__,__],[__,SH,SH,__,SH,__,__,__,__,__]];
-const L2 = [...LB, [__,__,WH,WH,__,WH,__,__,__,__],[__,__,SH,SH,__,SH,__,__,__,__]];
 
+// Shared leg sets (rows 8-11, 12 wide)
+const LEG_IDLE = [
+  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
+  [__,BK,BK,RD,RD,BK,BK,RD,RD,BK,BK,__],
+  [__,__,BK,RD,RD,BK,BK,RD,RD,BK,__,__],
+  [__,__,__,BK,BK,__,__,BK,BK,__,__,__],
+];
+const LEG_W1 = [
+  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
+  [BK,BK,RD,RD,BK,__,__,BK,RD,RD,BK,BK],
+  [BK,RD,RD,BK,__,__,__,__,BK,RD,RD,BK],
+  [__,BK,BK,__,__,__,__,__,__,BK,BK,__],
+];
+const LEG_W2 = [
+  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
+  [__,BK,BK,RD,RD,BK,BK,RD,RD,BK,BK,__],
+  [BK,RD,RD,BK,BK,__,__,BK,BK,RD,RD,BK],
+  [__,BK,BK,__,__,__,__,__,__,BK,BK,__],
+];
+
+// Left-specific legs (character occupies left half of sprite)
+const LL_IDLE = [
+  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
+  [BK,RD,RD,BK,__,__,BK,RD,RD,BK,__,__],
+  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__],
+  [__,__,BK,BK,__,__,__,BK,BK,__,__,__],
+];
+const LL_W1 = [
+  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
+  [BK,RD,RD,BK,__,__,__,BK,RD,RD,BK,__],
+  [BK,RD,RD,BK,__,__,BK,RD,RD,BK,__,__],
+  [__,BK,BK,__,__,__,__,BK,BK,__,__,__],
+];
+const LL_W2 = [
+  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
+  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__],
+  [BK,RD,RD,BK,__,__,__,BK,RD,RD,BK,__],
+  [__,BK,BK,__,__,__,__,__,BK,BK,__,__],
+];
+
+/* precompute all shadow strings once */
 const SH_MAP = {
-  front_idle: toShadow(F0), front_0: toShadow(F1), front_1: toShadow(F2),
-  back_idle:  toShadow(B0), back_0:  toShadow(B1), back_1:  toShadow(B2),
-  left_idle:  toShadow(L0), left_0:  toShadow(L1), left_1:  toShadow(L2),
+  front_idle: toShadow([...FB, ...LEG_IDLE]),
+  front_talk: toShadow([...FT, ...LEG_IDLE]),
+  front_0:    toShadow([...FB, ...LEG_W1]),
+  front_1:    toShadow([...FB, ...LEG_W2]),
+  back_idle:  toShadow([...BB, ...LEG_IDLE]),
+  back_0:     toShadow([...BB, ...LEG_W1]),
+  back_1:     toShadow([...BB, ...LEG_W2]),
+  left_idle:  toShadow([...LB, ...LL_IDLE]),
+  left_0:     toShadow([...LB, ...LL_W1]),
+  left_1:     toShadow([...LB, ...LL_W2]),
 };
+
+const CW = 12 * P; // 60px
+const CH = 12 * P; // 60px
+
+/* star particles that pop out when Kirby stops */
+function spawnStar(cx, cy) {
+  const syms = ['⭐', '✦', '★', '✨', '💫'];
+  const el = document.createElement('span');
+  el.textContent = syms[Math.floor(Math.random() * syms.length)];
+  const sz = 13 + Math.random() * 10;
+  const dx = (Math.random() - 0.5) * 60;
+  el.style.cssText = `
+    position:fixed;pointer-events:none;z-index:499;
+    left:${cx + dx}px;top:${cy}px;font-size:${sz}px;
+    animation:kirbyStar 1.1s ease-out forwards;
+  `;
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
 
 export default function TeacherAvatar() {
   const containerRef = useRef(null);
@@ -107,27 +160,39 @@ export default function TeacherAvatar() {
   const rafRef       = useRef(null);
 
   useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `@keyframes kirbyStar {
+      0%   { opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg); }
+      100% { opacity:0; transform:translate(-50%,calc(-50% - 60px)) scale(0.15) rotate(30deg); }
+    }`;
+    document.head.appendChild(style);
+
     const s = {
-      x: 180, y: 160,
-      vx: 1.1, vy: 0.55,
+      x: 200, y: 200,
+      vx: 1.0, vy: 0.45,
       dir: 'right', frame: 0,
-      walking: true,
+      // phases: walk → talk_pre → talk → idle_out → walk
+      phase: 'walk',
       nagVisible: false, nagIdx: 0,
-      frameTimer: 0, walkTimer: Math.random() * 1200,
-      nagTimer: 0, last: 0,
+      frameTimer: 0,
+      walkTimer: Math.random() * 1500,
+      nagTimer: 0,
+      bounceT: 0,
+      last: 0,
     };
 
     const tick = (t) => {
       const dt = s.last ? Math.min(t - s.last, 50) : 16;
       s.last = t;
 
-      if (s.walking) {
+      if (s.phase === 'walk') {
+        s.bounceT += dt;
         s.x += s.vx;
         s.y += s.vy;
 
-        const mx = window.innerWidth  - CW - 12;
-        const my = window.innerHeight - CH - 12;
-        if (s.x < 12) { s.vx =  Math.abs(s.vx); s.x = 12; }
+        const mx = window.innerWidth  - CW - 14;
+        const my = window.innerHeight - CH - 14;
+        if (s.x < 14) { s.vx =  Math.abs(s.vx); s.x = 14; }
         if (s.x > mx) { s.vx = -Math.abs(s.vx); s.x = mx; }
         if (s.y < 90) { s.vy =  Math.abs(s.vy); s.y = 90; }
         if (s.y > my) { s.vy = -Math.abs(s.vy); s.y = my; }
@@ -139,31 +204,59 @@ export default function TeacherAvatar() {
         if (s.frameTimer > 200) { s.frame ^= 1; s.frameTimer = 0; }
 
         s.walkTimer += dt;
-        if (s.walkTimer > 2400 + Math.random() * 2600) {
-          s.walking = false;
+        if (s.walkTimer > 2600 + Math.random() * 2800) {
+          s.phase = 'talk_pre';
           s.dir = 'front'; s.frame = 0;
+          s.nagTimer = 0; s.walkTimer = 0; s.bounceT = 0;
+          const cx = s.x + CW / 2, cy = s.y + CH / 2;
+          for (let i = 0; i < 6; i++) setTimeout(() => spawnStar(cx, cy), i * 90);
+        }
+
+      } else if (s.phase === 'talk_pre') {
+        s.nagTimer += dt;
+        if (s.nagTimer > 700) {
+          s.phase = 'talk';
           s.nagVisible = true;
           s.nagIdx = (s.nagIdx + 1) % NAGS.length;
-          s.nagTimer = 0; s.walkTimer = 0;
+          s.nagTimer = 0;
         }
-      } else {
+
+      } else if (s.phase === 'talk') {
         s.nagTimer += dt;
-        if (s.nagTimer > 2800) s.nagVisible = false;
-        if (s.nagTimer > 3800) {
-          s.walking = true;
+        if (s.nagTimer > 3000) {
+          s.nagVisible = false;
+          s.phase = 'idle_out';
+          s.nagTimer = 0;
+        }
+
+      } else if (s.phase === 'idle_out') {
+        s.nagTimer += dt;
+        if (s.nagTimer > 600) {
+          s.phase = 'walk';
           const a = Math.random() * Math.PI * 2;
-          const spd = 0.85 + Math.random() * 0.9;
+          const spd = 0.85 + Math.random() * 0.85;
           s.vx = Math.cos(a) * spd;
           s.vy = Math.sin(a) * spd * 0.6;
+          s.nagTimer = 0;
         }
       }
 
+      // Kirby bob while walking
+      const yOff = s.phase === 'walk' ? Math.sin(s.bounceT * 0.014) * 3 : 0;
       if (containerRef.current)
-        containerRef.current.style.transform = `translate(${s.x}px,${s.y}px)`;
+        containerRef.current.style.transform = `translate(${s.x}px,${Math.round(s.y + yOff)}px)`;
 
       if (wrapperRef.current && pixelRef.current) {
+        const speaking = s.phase === 'talk_pre' || s.phase === 'talk';
         const lr  = s.dir === 'right' ? 'left' : s.dir;
-        const key = s.walking ? `${lr}_${s.frame}` : `${lr}_idle`;
+        let key;
+        if (speaking) {
+          key = (Math.floor(s.nagTimer / 400) % 2 === 0) ? 'front_talk' : 'front_idle';
+        } else if (s.phase === 'walk') {
+          key = `${lr}_${s.frame}`;
+        } else {
+          key = `${lr}_idle`;
+        }
         wrapperRef.current.style.transform = s.dir === 'right' ? 'scaleX(-1)' : 'none';
         pixelRef.current.style.boxShadow   = SH_MAP[key] || SH_MAP.front_idle;
       }
@@ -177,7 +270,10 @@ export default function TeacherAvatar() {
     };
 
     rafRef.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      cancelAnimationFrame(rafRef.current);
+      style.remove();
+    };
   }, []);
 
   return (
@@ -208,32 +304,13 @@ export default function TeacherAvatar() {
         zIndex: 501,
       }}>
         <span ref={nagTextRef} />
-        {/* 꼬리 외곽 */}
-        <span style={{
-          position:'absolute', bottom:-10, left:'50%',
-          transform:'translateX(-50%)', display:'block',
-          width:0, height:0,
-          borderLeft:'7px solid transparent',
-          borderRight:'7px solid transparent',
-          borderTop:'10px solid #FF5673',
-        }}/>
-        {/* 꼬리 내부 */}
-        <span style={{
-          position:'absolute', bottom:-7, left:'50%',
-          transform:'translateX(-50%)', display:'block',
-          width:0, height:0,
-          borderLeft:'5px solid transparent',
-          borderRight:'5px solid transparent',
-          borderTop:'8px solid #fff',
-        }}/>
+        <span style={{ position:'absolute', bottom:-10, left:'50%', transform:'translateX(-50%)', display:'block', width:0, height:0, borderLeft:'7px solid transparent', borderRight:'7px solid transparent', borderTop:'10px solid #FF5673' }} />
+        <span style={{ position:'absolute', bottom:-7,  left:'50%', transform:'translateX(-50%)', display:'block', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'8px solid #fff' }} />
       </div>
 
-      {/* 픽셀 캐릭터 */}
+      {/* 픽셀 커비 */}
       <div ref={wrapperRef} style={{ width: CW, height: CH, position: 'relative' }}>
-        <div ref={pixelRef} style={{
-          width: P, height: P,
-          position: 'absolute', top: 0, left: 0,
-        }}/>
+        <div ref={pixelRef} style={{ width: P, height: P, position: 'absolute', top: 0, left: 0 }} />
       </div>
     </div>
   );
