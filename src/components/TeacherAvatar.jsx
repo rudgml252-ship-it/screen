@@ -16,153 +16,78 @@ const NAGS = [
   '🎒 가방 정리 잘 했죠?',
 ];
 
-// P = element size → each "pixel" is exactly P×P with 0 spread (no overlap)
-const P  = 5;
+/* ═══════════════════════════════════════════════════════════════
+   스프라이트 시트 설정
+   ───────────────────────────────────────────────────────────────
+   public/kirby.png 를 원본 이미지 (2816 × 1536 px) 로 가정.
+   아래 RAW 좌표는 원본 이미지 픽셀 기준 [x, y] (각 스프라이트 좌상단).
+   잘 안 맞으면 RAW 값 + SPRITE_W/H 만 수정하세요.
+   ═══════════════════════════════════════════════════════════════ */
+const ORIG_W   = 2816;
+const ORIG_H   = 1536;
+const SPRITE_W = 190;   // 원본에서 스프라이트 1개 가로 크기(px)
+const SPRITE_H = 190;   // 원본에서 스프라이트 1개 세로 크기(px)
+const DISPLAY  = 80;    // 화면에 표시할 크기(px)
 
-const __ = null;
-const BK = '#301808'; // dark brown outline (Kirby's oval eyes are brown, not black)
-const PK = '#F9A0B8'; // pink body
-const CP = '#EE7090'; // cheek blush
-const RD = '#CC1020'; // red feet
-const WH = '#FFFFFF'; // eye white
-const BL = '#4499CC'; // blue eye iris
-const MO = '#E85060'; // mouth interior
+const SC  = DISPLAY / SPRITE_W;                 // 스케일
+const BGW = Math.round(ORIG_W * SC);
+const BGH = Math.round(ORIG_H * SC);
 
-// shadow: element is P×P, spread=0 → exact pixel fit, no overlap
-const toShadow = (grid) => {
-  const s = [];
-  grid.forEach((row, y) => row.forEach((c, x) => {
-    if (c) s.push(`${x * P}px ${y * P}px 0 0 ${c}`);
-  }));
-  return s.join(',');
+// 원본 이미지 내 각 스프라이트 좌표 [x, y]
+// → 맞지 않으면 여기만 수정
+const RAW = {
+  // ── Stand ──
+  front_idle:   [  38, 133],
+  back_idle:    [ 228, 133],
+  left_idle:    [ 822, 133],
+  right_idle:   [1077, 133],
+
+  // ── Walking (front) 4프레임 ──
+  front_walk0:  [  38, 342],
+  front_walk1:  [ 229, 342],
+  front_walk2:  [ 420, 342],
+  front_walk3:  [ 611, 342],
+
+  // ── Walking (left) 4프레임 ──
+  left_walk0:   [ 870, 342],
+  left_walk1:   [1030, 342],
+  left_walk2:   [1190, 342],
+  left_walk3:   [1350, 342],
+
+  // ── Walking (right) 4프레임 ──
+  right_walk0:  [1678, 342],
+  right_walk1:  [1838, 342],
+  right_walk2:  [1998, 342],
+  right_walk3:  [2158, 342],
+
+  // ── Inhaling (입 벌리기 / talk 애니) ──
+  inhale0:      [  38, 700],
+  inhale1:      [ 260, 700],
+  inhale2:      [ 480, 700],
 };
 
-/* ══════════════════════════════════════════════
-   FRONT – 14 wide × 12 body rows (+ 2 leg rows)
-   ══════════════════════════════════════════════ */
-const FB = [
-  [__,__,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__], // 0
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],  // 1
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],  // 2
-  [BK,PK,PK,BK,BK,PK,PK,PK,BK,BK,PK,PK,BK,__],  // 3 eye top
-  [BK,PK,BK,WH,WH,BK,PK,BK,WH,WH,BK,PK,BK,__],  // 4 eyes (white)
-  [BK,PK,BK,WH,BL,BK,PK,BK,BL,WH,BK,PK,BK,__],  // 5 blue iris
-  [BK,PK,PK,BK,BK,PK,PK,PK,BK,BK,PK,PK,BK,__],  // 6 eye bottom
-  [BK,PK,CP,PK,PK,PK,PK,PK,PK,PK,CP,PK,BK,__],  // 7 cheeks
-  [BK,PK,PK,PK,MO,MO,MO,MO,PK,PK,PK,BK,__,__],  // 8 small closed mouth
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],  // 9
-  [PK,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,PK,__,__],  // 10 arm stubs
-  [__,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],  // 11 body bottom
-];
+// 화면 좌표로 변환
+const POS = Object.fromEntries(
+  Object.entries(RAW).map(([k, [x, y]]) => [
+    k,
+    `${-Math.round(x * SC)}px ${-Math.round(y * SC)}px`,
+  ])
+);
 
-// Kirby with open mouth (talk pose)
-const FT = [
-  ...FB.slice(0, 8),
-  [BK,PK,PK,BK,MO,MO,MO,MO,BK,PK,PK,BK,__,__],  // 8 open mouth outline
-  [__,BK,PK,BK,MO,MO,MO,MO,BK,PK,BK,__,__,__],  // 9 open mouth interior
-  ...FB.slice(10, 12),
-];
+// 6프레임 걷기 루프 (0→1→2→3→2→1)
+const WALK = ['walk0', 'walk1', 'walk2', 'walk3', 'walk2', 'walk1'];
 
-/* ══════════════════════════════════════════════
-   BACK – same shape, no face
-   ══════════════════════════════════════════════ */
-const BB = [
-  [__,__,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],
-  [PK,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,PK,__,__],
-  [__,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],
-];
-
-/* ══════════════════════════════════════════════
-   LEFT – round profile, one eye visible
-   (right direction uses CSS scaleX(-1))
-   ══════════════════════════════════════════════ */
-const LB = [
-  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__,__,__],  // 0
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__,__],  // 1
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],  // 2
-  [BK,PK,PK,BK,BK,PK,PK,PK,PK,PK,BK,__,__,__],  // 3 eye top
-  [BK,PK,BK,WH,WH,BK,PK,PK,PK,BK,__,__,__,__],  // 4 eye white
-  [BK,PK,BK,WH,BL,BK,PK,PK,BK,__,__,__,__,__],  // 5 blue iris
-  [BK,PK,PK,BK,BK,PK,PK,PK,BK,__,__,__,__,__],  // 6 eye bottom
-  [BK,PK,CP,PK,PK,PK,PK,PK,BK,__,__,__,__,__],  // 7 cheek
-  [BK,PK,PK,PK,MO,PK,PK,BK,__,__,__,__,__,__],  // 8 mouth (profile)
-  [__,BK,PK,PK,PK,PK,PK,BK,__,__,__,__,__,__],  // 9
-  [PK,BK,PK,PK,PK,PK,PK,BK,PK,__,__,__,__,__],  // 10 arm stubs (front+back)
-  [__,BK,BK,BK,BK,BK,BK,BK,__,__,__,__,__,__],  // 11 body bottom (flush to feet)
-];
-
-/* ══════════════════════════════════════════════
-   LEGS rows 12-13 (front/back – symmetric)
-   ══════════════════════════════════════════════ */
-// idle – feet together under body
-const LEG_I = [
-  [__,__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__,__],
-  [__,__,__,BK,BK,__,__,__,BK,BK,__,__,__,__],
-];
-// walk A – feet spread wide
-const LEG_A = [
-  [__,BK,RD,RD,BK,__,__,__,__,BK,RD,RD,BK,__],
-  [__,__,BK,BK,__,__,__,__,__,__,BK,BK,__,__],
-];
-// walk B – feet cross under centre
-const LEG_B = [
-  [__,__,__,BK,RD,RD,BK,RD,RD,BK,__,__,__,__],
-  [__,__,__,__,BK,RD,BK,RD,BK,__,__,__,__,__],
-];
-
-/* ══════════════════════════════════════════════
-   LEGS rows 12-13 (left/right side view)
-   ══════════════════════════════════════════════ */
-// idle – near+far foot visible, snug under body
-const LL_I = [
-  [__,__,BK,RD,RD,BK,BK,RD,BK,__,__,__,__,__],
-  [__,__,__,BK,BK,__,__,BK,__,__,__,__,__,__],
-];
-// walk A – feet spread
-const LL_A = [
-  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__,__,__],
-  [__,__,BK,BK,__,__,__,BK,BK,__,__,__,__,__],
-];
-// walk B – feet cross
-const LL_B = [
-  [__,__,BK,RD,BK,BK,RD,RD,BK,__,__,__,__,__],
-  [__,__,__,BK,__,__,BK,BK,__,__,__,__,__,__],
-];
-
-/* precompute all shadow strings once at module load */
-const SH = {
-  front_idle: toShadow([...FB, ...LEG_I]),
-  front_talk: toShadow([...FT, ...LEG_I]),
-  front_0:    toShadow([...FB, ...LEG_A]),
-  front_1:    toShadow([...FB, ...LEG_B]),
-  back_idle:  toShadow([...BB, ...LEG_I]),
-  back_0:     toShadow([...BB, ...LEG_A]),
-  back_1:     toShadow([...BB, ...LEG_B]),
-  left_idle:  toShadow([...LB, ...LL_I]),
-  left_0:     toShadow([...LB, ...LL_A]),
-  left_1:     toShadow([...LB, ...LL_B]),
-};
-
-const CW = 14 * P; // 70px
-const CH = 14 * P; // 70px
+const CW = DISPLAY;
+const CH = DISPLAY;
 
 function spawnStar(cx, cy) {
-  const syms = ['⭐','✦','★','✨','💫'];
+  const syms = ['⭐', '✦', '★', '✨', '💫'];
   const el = document.createElement('span');
   el.textContent = syms[Math.floor(Math.random() * syms.length)];
-  const sz = 13 + Math.random() * 10;
+  const sz = 13 + Math.random() * 11;
   el.style.cssText = [
     'position:fixed;pointer-events:none;z-index:499;',
-    `left:${cx + (Math.random() - 0.5) * 64}px;`,
+    `left:${cx + (Math.random() - 0.5) * 60}px;`,
     `top:${cy + (Math.random() - 0.5) * 20}px;`,
     `font-size:${sz}px;`,
     'animation:kirbyStar 1.1s ease-out forwards;',
@@ -173,8 +98,7 @@ function spawnStar(cx, cy) {
 
 export default function TeacherAvatar() {
   const containerRef = useRef(null);
-  const wrapperRef   = useRef(null);
-  const pixelRef     = useRef(null);
+  const spriteRef    = useRef(null);
   const bubbleRef    = useRef(null);
   const nagTextRef   = useRef(null);
   const rafRef       = useRef(null);
@@ -188,17 +112,31 @@ export default function TeacherAvatar() {
     document.head.appendChild(style);
 
     const s = {
-      x: 220, y: 200,
+      x: 220, y: 220,
       vx: 1.0, vy: 0.45,
-      dir: 'right', frame: 0,
-      // phase: walk → talk_pre (mouth opens) → talk (bubble) → idle_out → walk
+      dir: 'right', walkFrame: 0,
       phase: 'walk',
       nagVisible: false, nagIdx: 0,
       frameTimer: 0,
       walkTimer: Math.random() * 1500,
-      nagTimer: 0,
-      bounceT: 0,
-      last: 0,
+      nagTimer: 0, bounceT: 0, last: 0,
+    };
+
+    const getKey = () => {
+      const { phase, dir, walkFrame, nagTimer } = s;
+      const speaking = phase === 'talk_pre' || phase === 'talk';
+
+      if (speaking) {
+        // 입 벌리기 4단계 루프 (0→1→2→1→...)
+        const t = Math.floor(nagTimer / 320) % 4;
+        return `inhale${[0, 1, 2, 1][t]}`;
+      }
+      if (phase === 'walk') {
+        const f = WALK[walkFrame % WALK.length];
+        // back 방향은 front walk 프레임 사용 (별도 back-walk 없음)
+        return `${dir === 'back' ? 'front' : dir}_${f}`;
+      }
+      return `${dir}_idle`;
     };
 
     const tick = (t) => {
@@ -218,16 +156,20 @@ export default function TeacherAvatar() {
         if (s.y > my) { s.vy = -Math.abs(s.vy); s.y = my; }
 
         const ax = Math.abs(s.vx), ay = Math.abs(s.vy);
-        s.dir = ax >= ay ? (s.vx > 0 ? 'right' : 'left')
-                         : (s.vy > 0 ? 'front' : 'back');
+        s.dir = ax >= ay
+          ? (s.vx > 0 ? 'right' : 'left')
+          : (s.vy > 0 ? 'front' : 'back');
 
         s.frameTimer += dt;
-        if (s.frameTimer > 210) { s.frame ^= 1; s.frameTimer = 0; }
+        if (s.frameTimer > 175) {
+          s.walkFrame = (s.walkFrame + 1) % WALK.length;
+          s.frameTimer = 0;
+        }
 
         s.walkTimer += dt;
-        if (s.walkTimer > 2500 + Math.random() * 2700) {
+        if (s.walkTimer > 2600 + Math.random() * 2800) {
           s.phase = 'talk_pre';
-          s.dir = 'front'; s.frame = 0;
+          s.dir = 'front';
           s.nagTimer = 0; s.walkTimer = 0; s.bounceT = 0;
           const cx = s.x + CW / 2, cy = s.y + CH / 2;
           for (let i = 0; i < 6; i++) setTimeout(() => spawnStar(cx, cy), i * 90);
@@ -235,7 +177,7 @@ export default function TeacherAvatar() {
 
       } else if (s.phase === 'talk_pre') {
         s.nagTimer += dt;
-        if (s.nagTimer > 700) {
+        if (s.nagTimer > 900) {
           s.phase = 'talk';
           s.nagVisible = true;
           s.nagIdx = (s.nagIdx + 1) % NAGS.length;
@@ -244,7 +186,7 @@ export default function TeacherAvatar() {
 
       } else if (s.phase === 'talk') {
         s.nagTimer += dt;
-        if (s.nagTimer > 3000) {
+        if (s.nagTimer > 3200) {
           s.nagVisible = false;
           s.phase = 'idle_out';
           s.nagTimer = 0;
@@ -262,24 +204,14 @@ export default function TeacherAvatar() {
         }
       }
 
-      // Kirby bounce while walking
+      // 커비 위아래 통통 바운스
       const yOff = s.phase === 'walk' ? Math.sin(s.bounceT * 0.013) * 3 : 0;
       if (containerRef.current)
         containerRef.current.style.transform = `translate(${s.x}px,${Math.round(s.y + yOff)}px)`;
 
-      if (wrapperRef.current && pixelRef.current) {
-        const speaking = s.phase === 'talk_pre' || s.phase === 'talk';
-        const lr  = s.dir === 'right' ? 'left' : s.dir;
-        let key;
-        if (speaking) {
-          key = (Math.floor(s.nagTimer / 400) % 2 === 0) ? 'front_talk' : 'front_idle';
-        } else if (s.phase === 'walk') {
-          key = `${lr}_${s.frame}`;
-        } else {
-          key = `${lr}_idle`;
-        }
-        wrapperRef.current.style.transform = s.dir === 'right' ? 'scaleX(-1)' : 'none';
-        pixelRef.current.style.boxShadow   = SH[key] || SH.front_idle;
+      if (spriteRef.current) {
+        const key = getKey();
+        spriteRef.current.style.backgroundPosition = POS[key] || POS.front_idle;
       }
 
       if (bubbleRef.current)
@@ -314,14 +246,11 @@ export default function TeacherAvatar() {
         border: '2.5px solid #FF5673',
         borderRadius: 14,
         padding: '7px 13px',
-        fontSize: 12,
-        fontWeight: 700,
-        color: '#3D1A2A',
+        fontSize: 12, fontWeight: 700, color: '#3D1A2A',
         whiteSpace: 'nowrap',
         boxShadow: '0 3px 14px rgba(255,86,115,0.22)',
         fontFamily: 'sans-serif',
-        opacity: 0,
-        transition: 'opacity 0.3s',
+        opacity: 0, transition: 'opacity 0.3s',
         zIndex: 501,
       }}>
         <span ref={nagTextRef} />
@@ -329,10 +258,15 @@ export default function TeacherAvatar() {
         <span style={{ position:'absolute', bottom:-7,  left:'50%', transform:'translateX(-50%)', display:'block', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'8px solid #fff' }} />
       </div>
 
-      {/* 픽셀 커비 — element is P×P so each shadow is exactly P×P (no overlap) */}
-      <div ref={wrapperRef} style={{ width: CW, height: CH, position: 'relative' }}>
-        <div ref={pixelRef} style={{ width: P, height: P, position: 'absolute', top: 0, left: 0 }} />
-      </div>
+      {/* 커비 스프라이트 */}
+      <div ref={spriteRef} style={{
+        width: CW, height: CH,
+        backgroundImage: 'url(/kirby.png)',
+        backgroundSize: `${BGW}px ${BGH}px`,
+        backgroundRepeat: 'no-repeat',
+        imageRendering: 'pixelated',
+        backgroundPosition: POS.front_idle,
+      }} />
     </div>
   );
 }
