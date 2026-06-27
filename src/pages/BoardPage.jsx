@@ -1,196 +1,276 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import styles from './BoardPage.module.css';
 import { useMockDb } from '../context/MockDbContext';
+import styles from './BoardPage.module.css';
 
+/* ── helpers ── */
+const getDday = (targetDate) => {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const target = new Date(targetDate); target.setHours(0,0,0,0);
+  return Math.ceil((target - today) / 86400000);
+};
 const TYPE_CONFIG = {
-  URGENT: { label: '🚨 긴급', bg: '#FF4757', text: '#fff' },
-  GENERAL: { label: '📢 일반', bg: '#A8D8EA', text: '#2d6a88' },
-  SUBMIT: { label: '📝 제출', bg: '#FFEAA7', text: '#7B6000' },
-  SCHEDULE: { label: '📅 시간표', bg: '#B5EAD7', text: '#206040' },
+  URGENT:  { label:'🚨 긴급', bg:'#FF4757', text:'#fff' },
+  GENERAL: { label:'📢 일반', bg:'#80DEEA', text:'#006064' },
+  SUBMIT:  { label:'📝 제출', bg:'#FFEAA7', text:'#7B6000' },
+  SCHEDULE:{ label:'📅 시간표', bg:'#B2EBF2', text:'#00838F' },
 };
 
-const getBadge = (total) => {
-  if (total >= 30) return '👑';
-  if (total >= 20) return '🥇';
-  if (total >= 10) return '🥈';
-  if (total >= 5) return '🥉';
-  return '';
-};
+/* ── Rich Education Card ── */
+function EduCard({ data }) {
+  if (!Array.isArray(data.sections)) {
+    return (
+      <div className={styles.eduCard}>
+        <div className={styles.eduEmoji}>{data.emoji}</div>
+        <div className={styles.eduTitle}>{data.title}</div>
+        <div className={styles.eduBody}>{data.body}</div>
+      </div>
+    );
+  }
+  return (
+    <div className={styles.eduCardRich}>
+      <div className={styles.eduRichHeader} style={{ background: data.headerBg || '#26C6DA' }}>
+        <span className={styles.eduRichEmoji}>{data.mainEmoji}</span>
+        <div className={styles.eduRichHeaderText}>
+          <div className={styles.eduRichTitle}>{data.title}</div>
+          <div className={styles.eduRichMsg}>{data.keyMessage}</div>
+        </div>
+      </div>
+      <div className={styles.eduRichSections}>
+        {data.sections.map((sec, i) => (
+          <div key={i} className={styles.eduRichSection} style={{ background: sec.bg || '#F5F5F5' }}>
+            <div className={styles.eduSecTitle}>{sec.icon} {sec.title}</div>
+            <ul className={styles.eduSecList}>
+              {sec.items.map((item, j) => <li key={j}>{item}</li>)}
+            </ul>
+          </div>
+        ))}
+      </div>
+      {data.stats && data.stats.length > 0 && (
+        <div className={styles.eduStats}>
+          {data.stats.map((s, i) => (
+            <div key={i} className={styles.eduStatItem}>
+              <span className={styles.eduStatEmoji}>{s.emoji}</span>
+              <span className={styles.eduStatValue}>{s.value}</span>
+              <span className={styles.eduStatLabel}>{s.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {data.highlightText && (
+        <div className={styles.eduHighlight}>{data.highlightText}</div>
+      )}
+    </div>
+  );
+}
 
-// Chick SVG for board display
-const MiniChick = () => (
-  <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="32" height="32">
-    <ellipse cx="24" cy="32" rx="14" ry="12" fill="#FFEB3B"/>
-    <circle cx="24" cy="18" r="10" fill="#FFEB3B"/>
-    <circle cx="20" cy="16" r="2.5" fill="#333"/>
-    <circle cx="28" cy="16" r="2.5" fill="#333"/>
-    <circle cx="21" cy="15" r="1" fill="white"/>
-    <circle cx="29" cy="15" r="1" fill="white"/>
-    <path d="M21 21 L24 24 L27 21" fill="#FF8F00" stroke="#FF8F00" strokeWidth="0.5"/>
-    <ellipse cx="10" cy="32" rx="5" ry="7" fill="#FFC107" transform="rotate(-15 10 32)"/>
-    <ellipse cx="38" cy="32" rx="5" ry="7" fill="#FFC107" transform="rotate(15 38 32)"/>
-    <ellipse cx="16" cy="20" rx="3" ry="2" fill="rgba(255,150,130,0.5)"/>
-    <ellipse cx="32" cy="20" rx="3" ry="2" fill="rgba(255,150,130,0.5)"/>
-  </svg>
-);
-
-const MiniEgg = () => (
-  <svg viewBox="0 0 40 48" fill="none" xmlns="http://www.w3.org/2000/svg" width="24" height="30">
-    <ellipse cx="20" cy="26" rx="16" ry="20" fill="#FFF9C4" stroke="#F9C84A" strokeWidth="2"/>
-    <ellipse cx="14" cy="20" rx="3" ry="4" fill="rgba(255,255,255,0.5)"/>
-  </svg>
-);
-
-const BoardPage = () => {
+export default function BoardPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
   const { db } = useMockDb();
 
-  const [time, setTime] = useState(new Date());
-  const [quoteIndex] = useState(() => Math.floor(Math.random() * (db.quotes?.length || 1)));
+  const [now, setNow] = useState(new Date());
+  const [quoteIdx, setQuoteIdx] = useState(0);
+  const [eduIdx, setEduIdx] = useState(0);
+  const [photoIdx, setPhotoIdx] = useState(0);
 
   useEffect(() => {
-    const timer = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setNow(new Date()), 1000);
+    return () => clearInterval(t);
   }, []);
 
-  const dateStr = time.toLocaleDateString('ko-KR', { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' });
-  const timeStr = time.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+  /* ── 명언 (날짜 기반 시작, 20s 회전) ── */
+  const quotes = db.quotes || [];
+  useEffect(() => {
+    if (quotes.length === 0) return;
+    const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+    setQuoteIdx(dayOfYear % quotes.length);
+  }, [quotes.length]);
+  useEffect(() => {
+    if (quotes.length < 2) return;
+    const t = setInterval(() => setQuoteIdx(i => (i + 1) % quotes.length), 20000);
+    return () => clearInterval(t);
+  }, [quotes.length]);
 
-  const activeAnnouncements = db.announcements.filter(ann =>
-    !ann.expiresAt || ann.expiresAt > Date.now()
-  ).sort((a, b) => a.priority - b.priority);
+  /* ── 교육자료 (20s 회전) ── */
+  const eduCards = db.educationCards || [];
+  useEffect(() => {
+    if (eduCards.length < 2) return;
+    const t = setInterval(() => setEduIdx(i => (i + 1) % eduCards.length), 20000);
+    return () => clearInterval(t);
+  }, [eduCards.length]);
 
-  const top3 = [...db.students].sort((a, b) => b.stamps.total - a.stamps.total).slice(0, 3);
-  const quote = db.quotes?.[quoteIndex] || { text: '오늘도 최선을 다해봐요!', author: '선생님' };
+  /* ── 학급 사진 (6s 회전) ── */
+  const visiblePhotos = (db.photos || []).filter(p => p.visible);
+  useEffect(() => {
+    if (visiblePhotos.length < 2) return;
+    const t = setInterval(() => setPhotoIdx(i => (i + 1) % visiblePhotos.length), 6000);
+    return () => clearInterval(t);
+  }, [visiblePhotos.length]);
+
+  const dateStr = now.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
+  const timeStr = now.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
+
+  const sortedDdays = [...(db.ddays || [])]
+    .map(d => ({ ...d, diff: getDday(d.targetDate) }))
+    .sort((a, b) => a.diff - b.diff);
+
+  const activeAnn = [...(db.announcements || [])]
+    .filter(a => !a.expiresAt || a.expiresAt > Date.now())
+    .sort((a, b) => a.priority - b.priority);
+
+  const top3 = [...(db.students || [])].sort((a, b) => b.stamps.total - a.stamps.total).slice(0, 3);
+
+  const currentQuote = quotes[quoteIdx % Math.max(1, quotes.length)];
+  const currentEdu   = eduCards[eduIdx % Math.max(1, eduCards.length)];
+  const currentPhoto = visiblePhotos[photoIdx % Math.max(1, visiblePhotos.length)];
 
   return (
     <div className={`board-mode-root ${styles.board}`}>
-      {/* ─── Header Row ─── */}
+
+      {/* ── 귀여운 CSS 배경 ── */}
+      <div className={styles.bgBase} />
+      <div className={styles.bgBubbles}>
+        <span /><span /><span /><span /><span />
+        <span /><span /><span /><span /><span />
+      </div>
+
+      {/* ══ 헤더 ══ */}
       <header className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.dateText}>{dateStr}</div>
-          <div className={styles.classLabel}>🐣 우리 반</div>
-        </div>
-        <div className={styles.clock}>{timeStr}</div>
-        <button className={styles.teacherLink} onClick={() => navigate(`/teacher/${classId}`)}>
-          ✏️ 교사 패널
-        </button>
-      </header>
-
-      {/* ─── Main Grid ─── */}
-      <main className={styles.grid}>
-
-        {/* Announcement Panel */}
-        <section className={`${styles.panel} ${styles.announcePanel}`}>
-          <h2 className={styles.panelTitle}>📢 전달사항</h2>
-          <div className={styles.annList}>
-            {activeAnnouncements.length === 0 ? (
-              <div className={styles.emptyPanel}>오늘은 새로운 공지가 없어요 😊</div>
-            ) : (
-              activeAnnouncements.map(ann => {
-                const cfg = TYPE_CONFIG[ann.type] || TYPE_CONFIG.GENERAL;
-                return (
-                  <div
-                    key={ann.id}
-                    className={`${styles.annCard} ${ann.type === 'URGENT' ? styles.urgentCard : ''}`}
-                  >
-                    <span className={styles.annBadge} style={{ backgroundColor: cfg.bg, color: cfg.text }}>
-                      {cfg.label}
-                    </span>
-                    <p className={styles.annTitle}>{ann.title}</p>
-                    {ann.body && <p className={styles.annBody}>{ann.body}</p>}
-                  </div>
-                );
-              })
+          <div className={styles.headerMeta}>
+            <span className={styles.classTag}>🌿 {db.classInfo?.name}</span>
+            {sortedDdays[0] && (
+              <span className={styles.ddayChipHeader} style={{ background: sortedDdays[0].color }}>
+                {sortedDdays[0].title} {sortedDdays[0].diff < 0 ? `D+${Math.abs(sortedDdays[0].diff)}` : sortedDdays[0].diff === 0 ? 'D-Day' : `D-${sortedDdays[0].diff}`}
+              </span>
             )}
           </div>
+        </div>
+
+        <div className={styles.headerCenter}>
+          {currentQuote && (
+            <div className={styles.headerQuoteWrap} key={quoteIdx}>
+              <div className={styles.headerQuoteText}>"{currentQuote.text}"</div>
+              <div className={styles.headerQuoteAuthor}>— {currentQuote.author}</div>
+            </div>
+          )}
+        </div>
+
+        <div className={styles.headerRight}>
+          <div className={styles.clockBig}>{timeStr}</div>
+          <button className={styles.teacherBtn} onClick={() => navigate(`/teacher/${classId}`)}>✏️ 교사</button>
+        </div>
+      </header>
+
+      {/* ══ 메인 그리드 ══ */}
+      <main className={styles.mainGrid}>
+
+        {/* ── 왼쪽: 전달사항 ── */}
+        <section className={`${styles.panel} ${styles.annPanel}`}>
+          <div className={styles.panelTitle}>📢 전달사항</div>
+          <div className={styles.annList}>
+            {activeAnn.length === 0
+              ? <div className={styles.empty}>🌿 오늘은 새 공지가 없어요!</div>
+              : activeAnn.map(ann => {
+                  const cfg = TYPE_CONFIG[ann.type] || TYPE_CONFIG.GENERAL;
+                  return (
+                    <div key={ann.id} className={`${styles.annCard} ${ann.type === 'URGENT' ? styles.urgentCard : ''}`}>
+                      <span className={styles.annBadge} style={{ background: cfg.bg, color: cfg.text }}>{cfg.label}</span>
+                      <div className={styles.annTitle}>{ann.title}</div>
+                      {ann.body && <div className={styles.annBody}>{ann.body}</div>}
+                    </div>
+                  );
+                })
+            }
+          </div>
         </section>
 
-        {/* Quote / Routine Card */}
-        <section className={`${styles.panel} ${styles.quotePanel}`}>
-          <h2 className={styles.panelTitle}>💬 오늘의 명언</h2>
-          <div className={styles.quoteContent}>
-            <p className={styles.quoteText}>"{quote.text}"</p>
-            <p className={styles.quoteAuthor}>— {quote.author}</p>
-          </div>
-          <div className={styles.questSection}>
-            <h3 className={styles.questTitle}>🎯 오늘의 미션</h3>
-            {db.quests?.map(q => (
-              <div key={q.id} className={styles.questItem}>
-                <span>✅ {q.title}</span>
-                <span className={styles.questXp}>+{q.xpReward} XP</span>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* ── 가운데: 교육자료(위 2/3) + 칭찬왕(아래 1/3) ── */}
+        <section className={`${styles.panel} ${styles.eduPanel}`}>
 
-        {/* Stamp TOP 3 */}
-        <section className={`${styles.panel} ${styles.stampPanel}`}>
-          <h2 className={styles.panelTitle}>🏆 칭찬 스티커 TOP 3</h2>
-          <div className={styles.top3List}>
+          {/* 위: 교육자료 (더 크게) */}
+          <div className={styles.eduTop}>
+            <div className={styles.panelTitle}>📚 오늘의 교육</div>
+            {currentEdu
+              ? <EduCard data={currentEdu} />
+              : <div className={styles.empty}>📖 교육 자료가 없어요.</div>
+            }
+            <div className={styles.cardDots}>
+              {eduCards.map((_, i) => (
+                <span key={i} className={`${styles.dot} ${i === eduIdx ? styles.dotActive : ''}`} />
+              ))}
+            </div>
+          </div>
+
+          {/* 구분선 */}
+          <div className={styles.eduDivider} />
+
+          {/* 아래: 칭찬 TOP3 */}
+          <div className={styles.top3Bottom}>
+            <div className={styles.panelTitle}>🏆 이번 주 칭찬 왕</div>
             {top3.map((s, i) => {
               const medals = ['🥇', '🥈', '🥉'];
+              const chickCount = Math.min(s.stamps.total, 30);
               return (
-                <div key={s.id} className={styles.top3Item}>
-                  <span className={styles.medalEmoji}>{medals[i]}</span>
-                  <span className={styles.topName}>{s.name}</span>
-                  <div className={styles.topChicks}>
-                    {Array.from({ length: Math.min(s.stamps.total, 10) }).map((_, ci) => (
-                      <MiniChick key={ci} />
+                <div key={s.id} className={styles.top3Row}>
+                  <span className={styles.medal}>{medals[i]}</span>
+                  <span className={styles.top3Name}>{s.name}</span>
+                  <div className={styles.chickRow}>
+                    {Array.from({ length: chickCount }).map((_, ci) => (
+                      <span key={ci} className={styles.chickEmoji}>🐥</span>
                     ))}
-                    {s.stamps.total > 10 && (
-                      <span className={styles.extraCount}>+{s.stamps.total - 10}</span>
-                    )}
                   </div>
-                  <span className={styles.topCount}>{s.stamps.total}개</span>
+                  <span className={styles.top3Count}>{s.stamps.total}개</span>
                 </div>
               );
             })}
           </div>
+
         </section>
 
-        {/* XP Bar */}
-        <section className={`${styles.panel} ${styles.xpPanel}`}>
-          <h2 className={styles.panelTitle}>⭐ 학급 경험치</h2>
-          <div className={styles.levelBadge}>Lv. {db.xp.level}</div>
-          <div className={styles.xpBarOuter}>
-            <div
-              className={styles.xpBarInner}
-              style={{ width: `${Math.min(100, (db.xp.total / db.xp.nextLevelAt) * 100)}%` }}
-            />
-          </div>
-          <div className={styles.xpNumbers}>
-            {db.xp.total.toLocaleString()} / {db.xp.nextLevelAt.toLocaleString()} XP
-          </div>
+        {/* ── 오른쪽 위: D-day ── */}
+        <section className={`${styles.panel} ${styles.ddayPanel}`}>
+          <div className={styles.panelTitle}>📆 D-day</div>
+          {sortedDdays.slice(0, 5).map(d => (
+            <div key={d.id} className={styles.ddayRow}>
+              <span className={styles.ddayTitle}>{d.title}</span>
+              <span className={styles.ddayNum} style={{ color: d.diff < 0 ? '#78909C' : d.diff <= 3 ? '#FF4757' : '#006064' }}>
+                {d.diff < 0 ? `D+${Math.abs(d.diff)}` : d.diff === 0 ? 'D-Day' : `D-${d.diff}`}
+              </span>
+            </div>
+          ))}
+          {sortedDdays.length === 0 && <div className={styles.empty}>예정된 일정 없음</div>}
         </section>
 
-        {/* Student Chick Display */}
-        <section className={`${styles.panel} ${styles.chickPanel}`}>
-          <h2 className={styles.panelTitle}>🐣 우리 반 병아리 현황</h2>
-          <div className={styles.chickGrid}>
-            {[...db.students].sort((a, b) => a.number - b.number).map(s => (
-              <div key={s.id} className={styles.chickStudentItem}>
-                <div className={styles.chickStudentName}>{s.number}번 {s.name}</div>
-                <div className={styles.chickStudentRow}>
-                  {Array.from({ length: Math.min(s.stamps.total, 8) }).map((_, i) => (
-                    <MiniChick key={i} />
-                  ))}
-                  {Array.from({ length: Math.max(0, 8 - s.stamps.total) }).map((_, i) => (
-                    <MiniEgg key={`egg-${i}`} />
-                  ))}
-                  {s.stamps.total > 8 && (
-                    <span className={styles.extraCount}>+{s.stamps.total - 8}</span>
-                  )}
-                </div>
+        {/* ── 오른쪽 아래: 학급 사진 ── */}
+        <section className={`${styles.panel} ${styles.photoPanel}`}>
+          {visiblePhotos.length > 0 && currentPhoto ? (
+            <div className={styles.photoSlide}>
+              {visiblePhotos.map((p, i) => (
+                <div
+                  key={p.id}
+                  className={`${styles.photoImg} ${i === photoIdx ? styles.photoImgActive : ''}`}
+                  style={{ backgroundImage: `url(${p.url})` }}
+                />
+              ))}
+              <div className={styles.photoCaptionBar}>
+                <span>📸 {currentPhoto.caption}</span>
+                {visiblePhotos.length > 1 && (
+                  <span className={styles.photoCounter}>{photoIdx + 1} / {visiblePhotos.length}</span>
+                )}
               </div>
-            ))}
-          </div>
+            </div>
+          ) : (
+            <div className={styles.photoEmpty}>
+              <div className={styles.photoEmptyIcon}>📷</div>
+              <div>학급 사진을<br/>업로드해보세요!</div>
+            </div>
+          )}
         </section>
+
       </main>
     </div>
   );
-};
-
-export default BoardPage;
+}

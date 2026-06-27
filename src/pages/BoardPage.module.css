@@ -1,103 +1,460 @@
-.boardContainer {
-  background: url('https://images.unsplash.com/photo-1557683316-973673baf926?q=80&w=3840&auto=format&fit=crop') no-repeat center center fixed;
-  background-size: cover;
-  padding: 40px;
-}
+/* ══════════════════════════════════════════
+   BoardPage — Mint & Sky Blue Theme 🌿
+══════════════════════════════════════════ */
 
-.gridContainer {
-  display: grid;
-  grid-template-columns: repeat(12, 1fr);
-  grid-template-rows: repeat(8, 1fr);
-  gap: 32px;
-  height: 100%;
-}
-
-.header {
-  grid-column: 1 / 13;
-  grid-row: 1;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 40px;
-  border-radius: var(--radius-lg);
-}
-
-.clock {
-  font-size: 64px;
-  font-weight: bold;
-}
-
-.announcementPanel {
-  grid-column: 1 / 8;
-  grid-row: 2 / 6;
-  padding: 40px;
-  border-radius: var(--radius-lg);
+.board {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: 24px;
-}
-
-.announcementCard {
-  background: rgba(255, 255, 255, 0.5);
-  border-radius: var(--radius-md);
-  padding: 24px;
-}
-
-.annType {
-  display: inline-block;
-  padding: 8px 16px;
-  border-radius: var(--radius-full);
-  background: var(--color-danger);
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
-  margin-bottom: 16px;
-}
-
-.routineCard {
-  grid-column: 8 / 13;
-  grid-row: 2 / 6;
-  padding: 40px;
-  border-radius: var(--radius-lg);
-}
-
-.stampPanel {
-  grid-column: 1 / 5;
-  grid-row: 6 / 8;
-  padding: 32px;
-  border-radius: var(--radius-lg);
-}
-
-.topStudent {
-  font-size: 32px;
-  margin-top: 16px;
-}
-
-.xpPanel {
-  grid-column: 5 / 10;
-  grid-row: 6 / 8;
-  padding: 32px;
-  border-radius: var(--radius-lg);
-}
-
-.xpBarContainer {
-  width: 100%;
-  height: 48px;
-  background: rgba(0,0,0,0.1);
-  border-radius: var(--radius-full);
   overflow: hidden;
-  margin: 24px 0;
+  height: 100vh;
+  font-size: 14px;
 }
 
-.xpBar {
-  height: 100%;
-  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
-  transition: width 0.5s ease-out;
+/* ─── 귀여운 배경 (CSS 전용, 푸릇푸릇) ─── */
+.bgBase {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 10%, #C8F7F0 0%, transparent 45%),
+    radial-gradient(ellipse at 80% 5%,  #B3E5FC 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 90%, #C8F7E8 0%, transparent 50%),
+    radial-gradient(ellipse at 90% 70%, #B2EBF2 0%, transparent 40%),
+    radial-gradient(ellipse at 10% 80%, #DCEDC8 0%, transparent 45%),
+    linear-gradient(145deg, #E8F8F5 0%, #EBF5FB 40%, #E9F7F0 100%);
+  z-index: 0;
 }
 
-.questPanel {
-  grid-column: 10 / 13;
-  grid-row: 6 / 8;
-  padding: 32px;
-  border-radius: var(--radius-lg);
+/* 동동 떠다니는 버블 장식 */
+.bgBubbles {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden;
+}
+.bgBubbles span {
+  position: absolute;
+  display: block;
+  border-radius: 50%;
+  opacity: 0.35;
+  animation: floatUp 14s ease-in-out infinite;
+}
+.bgBubbles span:nth-child(1)  { width: 60px;  height: 60px;  left: 5%;   bottom: -80px; background: #80DEEA; animation-duration: 18s; animation-delay: 0s; }
+.bgBubbles span:nth-child(2)  { width: 40px;  height: 40px;  left: 15%;  bottom: -60px; background: #A5D6A7; animation-duration: 14s; animation-delay: 2s; }
+.bgBubbles span:nth-child(3)  { width: 80px;  height: 80px;  left: 28%;  bottom: -100px;background: #4DD0C4; animation-duration: 20s; animation-delay: 4s; }
+.bgBubbles span:nth-child(4)  { width: 30px;  height: 30px;  left: 42%;  bottom: -50px; background: #B2EBF2; animation-duration: 16s; animation-delay: 1s; }
+.bgBubbles span:nth-child(5)  { width: 55px;  height: 55px;  left: 60%;  bottom: -75px; background: #80DEEA; animation-duration: 22s; animation-delay: 3s; }
+.bgBubbles span:nth-child(6)  { width: 35px;  height: 35px;  left: 72%;  bottom: -55px; background: #C8E6C9; animation-duration: 15s; animation-delay: 6s; }
+.bgBubbles span:nth-child(7)  { width: 70px;  height: 70px;  left: 82%;  bottom: -90px; background: #4FC3F7; animation-duration: 19s; animation-delay: 2s; }
+.bgBubbles span:nth-child(8)  { width: 25px;  height: 25px;  left: 90%;  bottom: -40px; background: #A5D6A7; animation-duration: 13s; animation-delay: 5s; }
+.bgBubbles span:nth-child(9)  { width: 45px;  height: 45px;  left: 35%;  bottom: -65px; background: #26C6DA; animation-duration: 17s; animation-delay: 7s; }
+.bgBubbles span:nth-child(10) { width: 50px;  height: 50px;  left: 55%;  bottom: -70px; background: #81C784; animation-duration: 21s; animation-delay: 1s; }
+
+@keyframes floatUp {
+  0%   { transform: translateY(0) scale(1) rotate(0deg); opacity: 0; }
+  10%  { opacity: 0.35; }
+  90%  { opacity: 0.35; }
+  100% { transform: translateY(-110vh) scale(0.8) rotate(45deg); opacity: 0; }
+}
+
+/* ─── Header ─── */
+.header {
+  position: relative; z-index: 10;
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+  padding: 10px 20px;
+  background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(24px);
+  border-bottom: 3px solid #B2EBF2;
+  box-shadow: 0 2px 20px rgba(77,208,196,0.18);
+  flex-shrink: 0;
+  min-height: 80px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.dateText { font-size: 13px; font-weight: 600; color: #607D8B; }
+.headerMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.classTag {
+  font-size: 16px;
+  font-weight: 900;
+  color: #00695C;
+  background: #E0F7FA;
+  padding: 4px 12px;
+  border-radius: 20px;
+  border: 2px solid #B2EBF2;
+}
+.ddayChipHeader {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 800;
+  color: white;
+}
+
+/* 가운데: 명언 */
+.headerCenter {
+  text-align: center;
+  padding: 0 16px;
+  overflow: hidden;
+}
+.headerQuoteWrap {
+  animation: quoteFadeIn 0.8s ease-out;
+}
+@keyframes quoteFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.headerQuoteText {
+  font-size: 22px;
+  font-weight: 900;
+  color: #004D40;
+  line-height: 1.4;
+  font-style: italic;
+  letter-spacing: -0.3px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.headerQuoteAuthor {
+  font-size: 14px;
+  color: #78909C;
+  margin-top: 5px;
+  font-weight: 700;
+  font-style: normal;
+}
+
+/* 오른쪽 */
+.headerRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+.clockBig {
+  font-size: 26px;
+  font-weight: 900;
+  color: #00838F;
+  font-variant-numeric: tabular-nums;
+}
+.teacherBtn {
+  background: #E0F7FA;
+  color: #00695C;
+  border: 2px solid #B2EBF2;
+  padding: 7px 14px;
+  border-radius: 14px;
+  font-size: 13px;
+  font-weight: 600;
+  flex-shrink: 0;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.teacherBtn:hover { background: #26C6DA; color: white; transform: translateY(-2px); }
+
+/* ─── Main Grid ─── */
+.mainGrid {
+  position: relative; z-index: 10;
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1.2fr 2.8fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 10px;
+  padding: 10px 14px;
+  overflow: hidden;
+}
+
+.panel {
+  background: rgba(255,255,255,0.86);
+  backdrop-filter: blur(18px);
+  border-radius: 18px;
+  padding: 14px 16px;
+  border: 2px solid rgba(178,235,242,0.65);
+  box-shadow: 0 4px 20px rgba(38,198,218,0.10);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.panelTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #006064;
+  margin-bottom: 7px;
+  padding-bottom: 6px;
+  border-bottom: 2px dashed #B2EBF2;
+  flex-shrink: 0;
+}
+
+.empty { color: #80CBC4; font-size: 14px; text-align: center; padding: 16px; }
+
+/* ─── Announcement Panel ─── */
+.annPanel {
+  grid-column: 1;
+  grid-row: 1 / 3;
+}
+.annList {
+  display: flex; flex-direction: column; gap: 10px;
+  overflow-y: auto; flex: 1;
+}
+.annList::-webkit-scrollbar { width: 4px; }
+.annList::-webkit-scrollbar-thumb { background: #B2EBF2; border-radius: 2px; }
+
+.annCard {
+  background: #F0FDFC;
+  border: 2px solid #B2EBF2;
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.urgentCard {
+  border-color: #FF4757;
+  background: #FFF5F5;
+  animation: urgentPulse 2s ease-in-out infinite;
+}
+@keyframes urgentPulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(255,71,87,0.3); }
+  50%      { box-shadow: 0 0 0 8px rgba(255,71,87,0); }
+}
+.annBadge {
+  display: inline-block;
+  padding: 3px 10px; border-radius: 10px;
+  font-size: 11px; font-weight: 700;
+  margin-bottom: 6px;
+}
+.annTitle {
+  font-size: 17px; font-weight: 800; color: #004D40; line-height: 1.3;
+}
+.annBody {
+  font-size: 13px; color: #607D8B; margin-top: 4px; line-height: 1.4;
+}
+
+/* ─── Education + Photo Panel (가운데, 상하 분할) ─── */
+.eduPanel {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+  flex-direction: column;
+}
+
+/* 위: 교육자료 — 전체의 3/4 */
+.eduTop {
+  flex: 3 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 12px 16px 8px;
+  overflow: hidden;
+}
+
+/* 구분선 */
+.eduDivider {
+  height: 2px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, transparent, #B2EBF2, #80DEEA, #B2EBF2, transparent);
+  margin: 0 16px;
+}
+
+/* 아래: 칭찬왕 — 전체의 1/4 */
+.top3Bottom {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 8px 16px 12px;
+  overflow: hidden;
+}
+
+/* 사진 슬라이드 컨테이너 */
+.photoSlide {
+  position: relative;
+  flex: 1;
+  border-radius: 14px;
+  overflow: hidden;
+  min-height: 0;
+  background: #E0F7FA;
+}
+.photoImg {
+  position: absolute; inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transition: opacity 1.2s ease-in-out;
+  opacity: 0;
+}
+.photoImgActive { opacity: 1; }
+
+.photoCaptionBar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: linear-gradient(0deg, rgba(0,77,64,0.75) 0%, transparent 100%);
+  color: white;
+  padding: 20px 14px 10px;
+  font-size: 13px; font-weight: 600;
+  display: flex; justify-content: space-between; align-items: flex-end;
+}
+.photoCounter {
+  font-size: 11px;
+  background: rgba(255,255,255,0.25);
+  padding: 2px 8px; border-radius: 10px;
+  font-weight: 700;
+}
+
+.photoEmpty {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #80CBC4;
+  font-size: 13px;
+  background: rgba(224,247,250,0.4);
+  border-radius: 14px;
+  border: 2px dashed #B2EBF2;
+  text-align: center;
+  padding: 20px;
+}
+.photoEmptyIcon { font-size: 36px; }
+
+/* simple edu card (fallback) */
+.eduCard {
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; flex: 1; justify-content: center; padding: 8px;
+}
+.eduEmoji { font-size: 40px; }
+.eduTitle { font-size: 18px; font-weight: 800; color: #004D40; }
+.eduBody {
+  font-size: 14px; color: #00695C;
+  white-space: pre-line; line-height: 1.6; max-width: 90%;
+}
+
+/* Rich Edu Card (Infographic) — 스크롤 없이 한눈에 */
+.eduCardRich {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow: hidden;
+  text-align: left;
+}
+
+.eduRichHeader {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 12px; border-radius: 10px;
+  color: white; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+.eduRichEmoji { font-size: 30px; flex-shrink: 0; }
+.eduRichHeaderText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.eduRichTitle { font-size: 15px; font-weight: 900; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eduRichMsg { font-size: 11px; opacity: 0.92; line-height: 1.3; }
+
+/* 섹션 목록 — 가용 공간을 균등하게 나눔, 스크롤 없음 */
+.eduRichSections {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+/* 각 섹션이 남은 공간을 균등하게 채움 */
+.eduRichSection {
+  flex: 1;
+  min-height: 0;
+  border-radius: 8px;
+  padding: 4px 9px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.eduSecTitle {
+  font-size: 11.5px; font-weight: 800; color: #004D40;
+  margin-bottom: 2px; flex-shrink: 0;
+}
+.eduSecList {
+  margin: 0; padding-left: 12px;
+  display: flex; flex-direction: column;
+  gap: 0;
+  flex: 1; min-height: 0; overflow: hidden;
+}
+.eduSecList li {
+  font-size: 10.5px; color: #37474F; line-height: 1.38;
+}
+
+.eduStats {
+  display: flex; gap: 5px; flex-shrink: 0;
+}
+.eduStatItem {
+  flex: 1;
+  background: rgba(255,255,255,0.85);
+  border: 1.5px solid #B2EBF2;
+  border-radius: 8px; padding: 4px 6px;
+  text-align: center;
+  display: flex; flex-direction: column; align-items: center; gap: 1px;
+}
+.eduStatEmoji { font-size: 14px; }
+.eduStatValue { font-size: 12px; font-weight: 900; color: #00838F; }
+.eduStatLabel { font-size: 9px; color: #607D8B; line-height: 1.3; }
+
+.eduHighlight {
+  background: linear-gradient(135deg, #E0F7FA, #B2EBF2);
+  border-left: 3px solid #00ACC1;
+  padding: 4px 8px; border-radius: 7px;
+  font-size: 10px; font-weight: 700; color: #006064;
+  flex-shrink: 0; line-height: 1.35;
+}
+
+/* Card Dots */
+.cardDots {
+  display: flex; gap: 5px; justify-content: center;
+  flex-shrink: 0; margin-top: 8px;
+}
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #B2EBF2; }
+.dotActive { background: #26C6DA; width: 18px; border-radius: 4px; }
+
+/* ─── D-day Panel ─── */
+.ddayPanel {
+  grid-column: 3; grid-row: 1;
+}
+.ddayRow {
+  display: flex; justify-content: space-between; align-items: center;
+  background: #E0F7FA; border-radius: 10px;
+  padding: 8px 12px; margin-bottom: 6px;
+}
+.ddayTitle { font-size: 13px; font-weight: 600; color: #004D40; }
+.ddayNum { font-size: 18px; font-weight: 900; }
+
+/* ─── 칭찬왕 rows (eduPanel 하단) ─── */
+.top3Row {
+  display: flex; align-items: center; gap: 8px;
+  background: #E0F7FA; border-radius: 12px;
+  padding: 6px 10px; margin-bottom: 5px;
+  flex-shrink: 0;
+}
+.medal { font-size: 18px; flex-shrink: 0; }
+.top3Name { font-size: 13px; font-weight: 700; color: #004D40; min-width: 44px; flex-shrink: 0; }
+.chickRow { display: flex; align-items: center; gap: 1px; flex: 1; overflow: hidden; flex-wrap: wrap; }
+.chickEmoji { font-size: 14px; }
+.extraChick { font-size: 10px; color: #00838F; font-weight: 700; background: #E0F7FA; padding: 1px 5px; border-radius: 8px; }
+.top3Count { font-size: 12px; font-weight: 700; color: #00838F; flex-shrink: 0; }
+
+/* ─── 학급 사진 Panel (오른쪽 아래) ─── */
+.photoPanel {
+  grid-column: 3; grid-row: 2;
+  padding: 0;
+  overflow: hidden;
 }
