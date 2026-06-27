@@ -4,7 +4,7 @@ const MockDbContext = createContext(null);
 const gid = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 9999)}`;
 
 const defaultData = {
-  classInfo: { name: '3학년 2반', school: '행복초등학교', teacherName: '김선생님', year: 2026, semester: 1 },
+  classInfo: { name: '3학년 2반', school: '행복초등학교', teacherName: '김선생님', year: 2026, semester: 1, teacherPassword: '' },
 
   announcements: [
     { id: 'ann_1', type: 'URGENT', title: '🚨 체육 수업 우천으로 실내 변경', body: '강당 2층 집합! 실내화 꼭 지참하세요.', priority: 1, createdAt: Date.now() - 3600000, updatedAt: Date.now() - 3600000, expiresAt: Date.now() + 86400000, pinned: true },

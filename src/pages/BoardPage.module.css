@@ -459,3 +459,56 @@
   padding: 0;
   overflow: hidden;
 }
+
+/* ─── 교사 비밀번호 모달 ─── */
+.pwOverlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(60, 20, 35, 0.45);
+  backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+}
+.pwModal {
+  background: white;
+  border-radius: 22px;
+  padding: 36px 40px 32px;
+  box-shadow: 0 20px 60px rgba(200, 80, 120, 0.22);
+  width: 320px;
+  text-align: center;
+  border: 2px solid #FFCCD6;
+}
+.pwModalIcon { font-size: 36px; margin-bottom: 8px; }
+.pwModalTitle { font-size: 20px; font-weight: 900; color: #3D1A2A; margin-bottom: 4px; }
+.pwModalSub { font-size: 13px; color: #A8849A; margin-bottom: 18px; }
+.pwInput {
+  width: 100%; box-sizing: border-box;
+  padding: 12px 16px;
+  border: 2px solid #FFCCD6;
+  border-radius: 12px;
+  font-size: 18px;
+  text-align: center;
+  letter-spacing: 4px;
+  outline: none;
+  color: #3D1A2A;
+  transition: border-color 0.2s;
+}
+.pwInput:focus { border-color: #FF5673; }
+.pwError { font-size: 12px; color: #FF4757; margin: 6px 0 0; font-weight: 600; }
+.pwBtns {
+  display: flex; gap: 10px; margin-top: 18px;
+}
+.pwConfirmBtn {
+  flex: 1; padding: 11px;
+  background: #FF5673; color: white;
+  border: none; border-radius: 12px;
+  font-size: 15px; font-weight: 700;
+  cursor: pointer; transition: background 0.2s;
+}
+.pwConfirmBtn:hover { background: #E84570; }
+.pwCancelBtn {
+  flex: 1; padding: 11px;
+  background: #FFF0F4; color: #A8849A;
+  border: 2px solid #FFCCD6; border-radius: 12px;
+  font-size: 15px; font-weight: 600;
+  cursor: pointer; transition: background 0.2s;
+}
+.pwCancelBtn:hover { background: #FFE0E9; }

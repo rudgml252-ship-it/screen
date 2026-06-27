@@ -67,6 +67,13 @@ function SettingsTab({ db, updateClassInfo }) {
   const [teacher, setTeacher] = useState(info.teacherName || '');
   const [toast, setToast] = useState('');
 
+  const [pwCurrent, setPwCurrent] = useState('');
+  const [pwNew, setPwNew] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
+  const [pwToast, setPwToast] = useState('');
+
+  const hasPw = !!(info.teacherPassword);
+
   const handleSave = (e) => {
     e.preventDefault();
     updateClassInfo({
@@ -78,62 +85,134 @@ function SettingsTab({ db, updateClassInfo }) {
     setTimeout(() => setToast(''), 2000);
   };
 
+  const showPwMsg = (msg) => { setPwToast(msg); setTimeout(() => setPwToast(''), 2500); };
+
+  const handleSetPw = (e) => {
+    e.preventDefault();
+    if (hasPw && pwCurrent !== info.teacherPassword) { showPwMsg('❌ 현재 비밀번호가 틀렸습니다.'); return; }
+    if (pwNew.length < 4) { showPwMsg('❌ 비밀번호는 4자리 이상이어야 합니다.'); return; }
+    if (pwNew !== pwConfirm) { showPwMsg('❌ 새 비밀번호가 일치하지 않습니다.'); return; }
+    updateClassInfo({ teacherPassword: pwNew });
+    setPwCurrent(''); setPwNew(''); setPwConfirm('');
+    showPwMsg('✅ 비밀번호가 설정됐습니다!');
+  };
+
+  const handleRemovePw = () => {
+    if (pwCurrent !== info.teacherPassword) { showPwMsg('❌ 현재 비밀번호가 틀렸습니다.'); return; }
+    updateClassInfo({ teacherPassword: '' });
+    setPwCurrent('');
+    showPwMsg('✅ 비밀번호가 제거됐습니다.');
+  };
+
   return (
-    <div className={styles.card} style={{ maxWidth: 520 }}>
-      <h3 className={styles.cardTitle}>⚙️ 학급 기본 정보</h3>
-      <form onSubmit={handleSave} className={styles.form}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 20, maxWidth: 520 }}>
+      <div className={styles.card}>
+        <h3 className={styles.cardTitle}>⚙️ 학급 기본 정보</h3>
+        <form onSubmit={handleSave} className={styles.form}>
 
-        <label className={styles.label}>학년 · 반</label>
-        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-          <select className={styles.input} value={grade} onChange={e => setGrade(e.target.value)} style={{ flex: 1 }}>
-            {[1,2,3,4,5,6].map(g => (
-              <option key={g} value={g}>{g}학년</option>
-            ))}
-          </select>
-          <select className={styles.input} value={classNum} onChange={e => setClassNum(e.target.value)} style={{ flex: 1 }}>
-            {Array.from({ length: 15 }, (_, i) => i + 1).map(n => (
-              <option key={n} value={n}>{n}반</option>
-            ))}
-          </select>
+          <label className={styles.label}>학년 · 반</label>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <select className={styles.input} value={grade} onChange={e => setGrade(e.target.value)} style={{ flex: 1 }}>
+              {[1,2,3,4,5,6].map(g => (
+                <option key={g} value={g}>{g}학년</option>
+              ))}
+            </select>
+            <select className={styles.input} value={classNum} onChange={e => setClassNum(e.target.value)} style={{ flex: 1 }}>
+              {Array.from({ length: 15 }, (_, i) => i + 1).map(n => (
+                <option key={n} value={n}>{n}반</option>
+              ))}
+            </select>
+          </div>
+
+          <label className={styles.label} style={{ marginTop: 14 }}>학교 이름</label>
+          <input
+            className={styles.input}
+            placeholder="예: 행복초등학교"
+            value={school}
+            onChange={e => setSchool(e.target.value)}
+          />
+
+          <label className={styles.label} style={{ marginTop: 14 }}>담임 선생님 이름</label>
+          <input
+            className={styles.input}
+            placeholder="예: 김선생님"
+            value={teacher}
+            onChange={e => setTeacher(e.target.value)}
+          />
+
+          <button type="submit" className={styles.pinkBtn} style={{ marginTop: 20 }}>
+            💾 저장하기
+          </button>
+        </form>
+
+        <div className={styles.studentSummary} style={{ marginTop: 20 }}>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryNum}>{grade}학년</span>
+            <span className={styles.summaryLabel}>학년</span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryNum}>{classNum}반</span>
+            <span className={styles.summaryLabel}>반</span>
+          </div>
+          <div className={styles.summaryItem}>
+            <span className={styles.summaryNum} style={{ fontSize: 16 }}>{school || '-'}</span>
+            <span className={styles.summaryLabel}>학교</span>
+          </div>
         </div>
 
-        <label className={styles.label} style={{ marginTop: 14 }}>학교 이름</label>
-        <input
-          className={styles.input}
-          placeholder="예: 행복초등학교"
-          value={school}
-          onChange={e => setSchool(e.target.value)}
-        />
-
-        <label className={styles.label} style={{ marginTop: 14 }}>담임 선생님 이름</label>
-        <input
-          className={styles.input}
-          placeholder="예: 김선생님"
-          value={teacher}
-          onChange={e => setTeacher(e.target.value)}
-        />
-
-        <button type="submit" className={styles.pinkBtn} style={{ marginTop: 20 }}>
-          💾 저장하기
-        </button>
-      </form>
-
-      <div className={styles.studentSummary} style={{ marginTop: 20 }}>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryNum}>{grade}학년</span>
-          <span className={styles.summaryLabel}>학년</span>
-        </div>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryNum}>{classNum}반</span>
-          <span className={styles.summaryLabel}>반</span>
-        </div>
-        <div className={styles.summaryItem}>
-          <span className={styles.summaryNum} style={{ fontSize: 16 }}>{school || '-'}</span>
-          <span className={styles.summaryLabel}>학교</span>
-        </div>
+        {toast && <div className={styles.toast}>{toast}</div>}
       </div>
 
-      {toast && <div className={styles.toast}>{toast}</div>}
+      {/* 비밀번호 관리 */}
+      <div className={styles.card}>
+        <h3 className={styles.cardTitle}>🔐 교사 모드 비밀번호</h3>
+        <p style={{ fontSize: 13, color: '#9B8B90', marginBottom: 14 }}>
+          {hasPw ? '비밀번호가 설정되어 있습니다. 전자칠판에서 교사 모드 진입 시 비밀번호를 요구합니다.' : '비밀번호를 설정하면 전자칠판에서 교사 모드 진입 시 확인합니다.'}
+        </p>
+        <form onSubmit={handleSetPw} className={styles.form}>
+          {hasPw && (
+            <>
+              <label className={styles.label}>현재 비밀번호</label>
+              <input
+                className={styles.input}
+                type="password"
+                placeholder="현재 비밀번호"
+                value={pwCurrent}
+                onChange={e => setPwCurrent(e.target.value)}
+              />
+            </>
+          )}
+          <label className={styles.label} style={{ marginTop: hasPw ? 12 : 0 }}>
+            {hasPw ? '새 비밀번호' : '비밀번호 설정'}
+          </label>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="4자리 이상"
+            value={pwNew}
+            onChange={e => setPwNew(e.target.value)}
+          />
+          <label className={styles.label} style={{ marginTop: 12 }}>비밀번호 확인</label>
+          <input
+            className={styles.input}
+            type="password"
+            placeholder="동일하게 입력"
+            value={pwConfirm}
+            onChange={e => setPwConfirm(e.target.value)}
+          />
+          <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+            <button type="submit" className={styles.pinkBtn} style={{ flex: 1 }}>
+              {hasPw ? '🔑 비밀번호 변경' : '🔒 비밀번호 설정'}
+            </button>
+            {hasPw && (
+              <button type="button" className={styles.grayBtn} style={{ flex: 1 }} onClick={handleRemovePw}>
+                🔓 비밀번호 제거
+              </button>
+            )}
+          </div>
+        </form>
+        {pwToast && <div className={styles.toast}>{pwToast}</div>}
+      </div>
     </div>
   );
 }

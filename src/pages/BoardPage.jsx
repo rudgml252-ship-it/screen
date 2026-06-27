@@ -73,6 +73,9 @@ export default function BoardPage() {
   const [quoteIdx, setQuoteIdx] = useState(0);
   const [eduIdx, setEduIdx] = useState(0);
   const [photoIdx, setPhotoIdx] = useState(0);
+  const [showPwModal, setShowPwModal] = useState(false);
+  const [pwInput, setPwInput] = useState('');
+  const [pwError, setPwError] = useState('');
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
@@ -107,6 +110,27 @@ export default function BoardPage() {
     const t = setInterval(() => setPhotoIdx(i => (i + 1) % visiblePhotos.length), 6000);
     return () => clearInterval(t);
   }, [visiblePhotos.length]);
+
+  const handleTeacherClick = () => {
+    const pw = db.classInfo?.teacherPassword;
+    if (!pw) {
+      navigate(`/teacher/${classId}`);
+    } else {
+      setPwInput('');
+      setPwError('');
+      setShowPwModal(true);
+    }
+  };
+
+  const handlePwSubmit = (e) => {
+    e.preventDefault();
+    if (pwInput === db.classInfo?.teacherPassword) {
+      setShowPwModal(false);
+      navigate(`/teacher/${classId}`);
+    } else {
+      setPwError('비밀번호가 틀렸습니다.');
+    }
+  };
 
   const dateStr = now.toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' });
   const timeStr = now.toLocaleTimeString('ko-KR', { hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false });
@@ -160,7 +184,7 @@ export default function BoardPage() {
 
         <div className={styles.headerRight}>
           <div className={styles.clockBig}>{timeStr}</div>
-          <button className={styles.teacherBtn} onClick={() => navigate(`/teacher/${classId}`)}>✏️ 교사</button>
+          <button className={styles.teacherBtn} onClick={handleTeacherClick}>✏️ 교사</button>
         </div>
       </header>
 
@@ -271,6 +295,31 @@ export default function BoardPage() {
         </section>
 
       </main>
+
+      {showPwModal && (
+        <div className={styles.pwOverlay} onClick={() => setShowPwModal(false)}>
+          <div className={styles.pwModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.pwModalIcon}>🔐</div>
+            <div className={styles.pwModalTitle}>교사 모드</div>
+            <p className={styles.pwModalSub}>비밀번호를 입력하세요</p>
+            <form onSubmit={handlePwSubmit}>
+              <input
+                className={styles.pwInput}
+                type="password"
+                autoFocus
+                value={pwInput}
+                onChange={e => { setPwInput(e.target.value); setPwError(''); }}
+                placeholder="비밀번호"
+              />
+              {pwError && <p className={styles.pwError}>{pwError}</p>}
+              <div className={styles.pwBtns}>
+                <button type="submit" className={styles.pwConfirmBtn}>확인</button>
+                <button type="button" className={styles.pwCancelBtn} onClick={() => setShowPwModal(false)}>취소</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
