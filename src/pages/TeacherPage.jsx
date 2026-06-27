@@ -47,7 +47,6 @@ const TABS = [
   { key:'dday',      label:'📅 D-day 관리' },
   { key:'picker',    label:'🎲 발표자 뽑기' },
   { key:'timer',     label:'⏱️ 타이머' },
-  { key:'cleaning',  label:'🧹 청소 당번' },
   { key:'election',  label:'🗳️ 투표/선거' },
 ];
 
@@ -688,34 +687,6 @@ function PhotosTab({ db, addClassPhoto, deleteClassPhoto, togglePhotoVisibility,
   );
 }
 
-/* ── 7. 청소 당번 ── */
-function CleaningTab({ db, rotateCleaningRota }) {
-  const groups = db.cleaningRota?.groups || [];
-  const students = db.students || [];
-  const getNames = (ids) => ids.map(id => students.find(s=>s.id===id)?.name || id).join(', ');
-
-  return (
-    <div className={styles.card} style={{maxWidth:700}}>
-      <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:20}}>
-        <h3 className={styles.cardTitle} style={{marginBottom:0}}>🧹 청소 당번 현황</h3>
-        <button className={styles.pinkBtn} onClick={rotateCleaningRota}>🔄 순번 돌리기</button>
-      </div>
-      {groups.map(g => (
-        <div key={g.id} className={styles.cleanCard}>
-          <div className={styles.cleanGroupName}>{g.name}</div>
-          <div className={styles.cleanDuty}>{g.duty}</div>
-          <div className={styles.cleanMembers}>👤 {getNames(g.members)}</div>
-        </div>
-      ))}
-      {db.cleaningRota?.lastRotated && (
-        <p style={{fontSize:12,color:'#C9A0B0',marginTop:12,textAlign:'right'}}>
-          마지막 순번 변경: {new Date(db.cleaningRota.lastRotated).toLocaleString('ko-KR')}
-        </p>
-      )}
-    </div>
-  );
-}
-
 /* ── 8. 투표/선거 ── */
 function ElectionTab({ db, startElection, addCandidate, castVote, resetElection }) {
   const el = db.election;
@@ -916,7 +887,7 @@ export default function TeacherPage() {
     addStudent, deleteStudent, renameStudent,
     addDday, deleteDday,
     addClassPhoto, deleteClassPhoto, togglePhotoVisibility, updatePhotoCaption,
-    pickStudent, resetPicker, toggleExcluded, rotateCleaningRota,
+    pickStudent, resetPicker, toggleExcluded,
     startElection, addCandidate, castVote, resetElection,
     updateClassInfo, resetDb,
   } = useMockDb();
@@ -955,8 +926,7 @@ export default function TeacherPage() {
         {tab==='dday'      && <DdayTab db={db} addDday={addDday} deleteDday={deleteDday}/>}
         {tab==='students'  && <StudentsTab db={db} addStudent={addStudent} deleteStudent={deleteStudent} renameStudent={renameStudent}/>}
         {tab==='photos'    && <PhotosTab db={db} addClassPhoto={addClassPhoto} deleteClassPhoto={deleteClassPhoto} togglePhotoVisibility={togglePhotoVisibility} updatePhotoCaption={updatePhotoCaption}/>}
-        {tab==='cleaning'  && <CleaningTab db={db} rotateCleaningRota={rotateCleaningRota}/>}
-        {tab==='election'  && <ElectionTab db={db} startElection={startElection} addCandidate={addCandidate} castVote={castVote} resetElection={resetElection}/>}
+{tab==='election'  && <ElectionTab db={db} startElection={startElection} addCandidate={addCandidate} castVote={castVote} resetElection={resetElection}/>}
         {tab==='timer'     && <TimerTab/>}
       </div>
 
