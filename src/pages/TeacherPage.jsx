@@ -40,15 +40,15 @@ const resizeImage = (file) => new Promise((resolve) => {
 /* ════ TABS ════ */
 const TABS = [
   { key:'settings',  label:'⚙️ 학급 설정' },
-  { key:'announce',  label:'📢 공지사항' },
-  { key:'stamps',    label:'🐥 칭찬 스티커' },
-  { key:'picker',    label:'🎲 발표자 뽑기' },
-  { key:'dday',      label:'📅 D-day 관리' },
   { key:'students',  label:'👥 학생 관리' },
+  { key:'stamps',    label:'🐥 칭찬 스티커' },
+  { key:'announce',  label:'📢 공지사항' },
   { key:'photos',    label:'📸 학급 사진' },
+  { key:'dday',      label:'📅 D-day 관리' },
+  { key:'picker',    label:'🎲 발표자 뽑기' },
+  { key:'timer',     label:'⏱️ 타이머' },
   { key:'cleaning',  label:'🧹 청소 당번' },
   { key:'election',  label:'🗳️ 투표/선거' },
-  { key:'timer',     label:'⏱️ 타이머' },
 ];
 
 /* ════ SUB-COMPONENTS ════ */
@@ -144,6 +144,8 @@ function AnnounceTab({ db, addAnnouncement, deleteAnnouncement }) {
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const [type, setType] = useState('GENERAL');
+  const [showCleaningForm, setShowCleaningForm] = useState(false);
+  const [cleaningMsg, setCleaningMsg] = useState('');
 
   const submit = (e) => {
     e.preventDefault();
@@ -152,24 +154,78 @@ function AnnounceTab({ db, addAnnouncement, deleteAnnouncement }) {
     setTitle(''); setBody('');
   };
 
+  const openCleaningForm = () => {
+    const students = db.students || [];
+    const getNames = (ids) => ids.map(id => students.find(s => s.id === id)?.name || id).filter(Boolean).join(', ');
+    const groups = db.cleaningRota?.groups || [];
+    const preview = groups.map(g => `${g.name} (${g.duty}): ${getNames(g.members)}`).join('\n');
+    setCleaningMsg(preview);
+    setShowCleaningForm(true);
+  };
+
+  const submitCleaning = () => {
+    if (!cleaningMsg.trim()) return;
+    addAnnouncement({
+      title: '🧹 오늘의 청소 당번',
+      body: cleaningMsg,
+      type: 'GENERAL',
+      priority: 3,
+      pinned: false,
+    });
+    setShowCleaningForm(false);
+    setCleaningMsg('');
+  };
+
   return (
     <div className={styles.twoCol}>
-      <div className={styles.card}>
-        <h3 className={styles.cardTitle}>✏️ 새 공지 작성</h3>
-        <form onSubmit={submit} className={styles.form}>
-          <div className={styles.chipRow}>
-            {Object.entries(TYPE_LABELS).map(([k,v]) => (
-              <button key={k} type="button" onClick={() => setType(k)}
-                className={`${styles.chip} ${type===k ? styles.chipActive : ''}`}
-                style={type===k ? { background: v.color } : {}}>
-                {v.icon} {v.label}
-              </button>
-            ))}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+
+        {/* 청소 당번 공지 */}
+        <div className={styles.card}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: showCleaningForm ? 14 : 0 }}>
+            <h3 className={styles.cardTitle} style={{ marginBottom: 0 }}>🧹 오늘의 청소 공지</h3>
+            <button
+              className={styles.purpleBtn}
+              onClick={() => showCleaningForm ? setShowCleaningForm(false) : openCleaningForm()}
+            >
+              {showCleaningForm ? '✕ 닫기' : '📋 청소 당번 공지 등록'}
+            </button>
           </div>
-          <input className={styles.input} placeholder="제목" value={title} onChange={e=>setTitle(e.target.value)} required />
-          <textarea className={styles.textarea} placeholder="내용 (선택)" value={body} onChange={e=>setBody(e.target.value)} />
-          <button type="submit" className={styles.pinkBtn}>🔔 공지 등록</button>
-        </form>
+          {showCleaningForm && (
+            <>
+              <p style={{ fontSize: 12, color: '#9B8B80', marginBottom: 8 }}>내용을 수정한 뒤 공지로 등록하세요.</p>
+              <textarea
+                className={styles.textarea}
+                value={cleaningMsg}
+                onChange={e => setCleaningMsg(e.target.value)}
+                rows={Math.max(4, (db.cleaningRota?.groups?.length || 3) + 1)}
+              />
+              <button className={styles.pinkBtn} onClick={submitCleaning} style={{ marginTop: 8 }}>
+                🔔 공지로 등록
+              </button>
+            </>
+          )}
+        </div>
+
+        {/* 일반 공지 작성 */}
+        <div className={styles.card}>
+          <h3 className={styles.cardTitle}>✏️ 새 공지 작성</h3>
+          <form onSubmit={submit} className={styles.form}>
+            <div className={styles.chipRow}>
+              {Object.entries(TYPE_LABELS).map(([k,v]) => (
+                <button key={k} type="button" onClick={() => setType(k)}
+                  className={`${styles.chip} ${type===k ? styles.chipActive : ''}`}
+                  style={type===k ? { background: v.color } : {}}>
+                  {v.icon} {v.label}
+                </button>
+              ))}
+            </div>
+            <input className={styles.input} placeholder="제목" value={title} onChange={e=>setTitle(e.target.value)} required />
+            <textarea className={styles.textarea} placeholder="내용 (선택)" value={body} onChange={e=>setBody(e.target.value)} />
+            <button type="submit" className={styles.pinkBtn}>🔔 공지 등록</button>
+          </form>
+        </div>
+
       </div>
       <div className={styles.card}>
         <h3 className={styles.cardTitle}>📋 현재 공지 ({db.announcements?.length || 0}건)</h3>
@@ -185,7 +241,7 @@ function AnnounceTab({ db, addAnnouncement, deleteAnnouncement }) {
                     <button className={styles.delBtn} onClick={()=>deleteAnnouncement(a.id)}>✕</button>
                   </div>
                   <p className={styles.annTitle}>{a.title}</p>
-                  {a.body && <p className={styles.annBody}>{a.body}</p>}
+                  {a.body && <p className={styles.annBody} style={{whiteSpace:'pre-line'}}>{a.body}</p>}
                 </div>
               );
             })}

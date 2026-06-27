@@ -285,6 +285,26 @@ export const MockDbProvider = ({ children }) => {
         if (needsUpdate) {
           parsed.educationCards = defaultData.educationCards;
         }
+        // 학생 ID 중복 수정 마이그레이션
+        if (parsed.students) {
+          const seenIds = new Set();
+          parsed.students = parsed.students.map(s => {
+            if (seenIds.has(s.id)) {
+              const newId = gid('s');
+              // pickerSession pool/history/excluded 도 함께 교체
+              if (parsed.pickerSession) {
+                const fix = (arr) => arr.map(id => id === s.id ? newId : id);
+                parsed.pickerSession.pool     = fix(parsed.pickerSession.pool || []);
+                parsed.pickerSession.excluded = fix(parsed.pickerSession.excluded || []);
+                parsed.pickerSession.history  = fix(parsed.pickerSession.history || []);
+                if (parsed.pickerSession.lastPickedId === s.id) parsed.pickerSession.lastPickedId = newId;
+              }
+              return { ...s, id: newId };
+            }
+            seenIds.add(s.id);
+            return s;
+          });
+        }
         // 명언 8개 이하면 최신 버전으로 교체
         if (!parsed.quotes || parsed.quotes.length < 20) {
           parsed.quotes = defaultData.quotes;
