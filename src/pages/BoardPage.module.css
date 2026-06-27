@@ -1,5 +1,6 @@
 /* ══════════════════════════════════════════
    BoardPage — Sunset & Salmon Theme 🌅
+   핑크-로즈 살몬 / 노을빛
 ══════════════════════════════════════════ */
 
 .board {
@@ -11,16 +12,16 @@
   font-size: 14px;
 }
 
-/* ─── 노을 배경 (CSS 전용) ─── */
+/* ─── 노을 배경 (핑크-로즈, 누리끼리 없음) ─── */
 .bgBase {
   position: absolute; inset: 0;
   background:
-    radial-gradient(ellipse at 15% 10%, #FFD4B8 0%, transparent 45%),
-    radial-gradient(ellipse at 85% 8%,  #FFBCAA 0%, transparent 40%),
-    radial-gradient(ellipse at 50% 88%, #FFE0C8 0%, transparent 50%),
-    radial-gradient(ellipse at 92% 65%, #FFDAC4 0%, transparent 40%),
-    radial-gradient(ellipse at 8%  75%, #FFE8D0 0%, transparent 45%),
-    linear-gradient(145deg, #FFF5EE 0%, #FFF0E8 40%, #FFF8F2 100%);
+    radial-gradient(ellipse at 15% 10%, #FFD0DC 0%, transparent 42%),
+    radial-gradient(ellipse at 85% 8%,  #FFACE4 0%, transparent 38%),
+    radial-gradient(ellipse at 50% 88%, #FFD6E4 0%, transparent 48%),
+    radial-gradient(ellipse at 92% 65%, #FFCCD8 0%, transparent 38%),
+    radial-gradient(ellipse at 8%  75%, #FFE0ED 0%, transparent 42%),
+    linear-gradient(145deg, #FFFBFC 0%, #FFF8FA 40%, #FFFCFD 100%);
   z-index: 0;
 }
 
@@ -32,24 +33,24 @@
   position: absolute;
   display: block;
   border-radius: 50%;
-  opacity: 0.30;
+  opacity: 0.28;
   animation: floatUp 14s ease-in-out infinite;
 }
-.bgBubbles span:nth-child(1)  { width: 60px;  height: 60px;  left: 5%;   bottom: -80px; background: #F4A07A; animation-duration: 18s; animation-delay: 0s; }
-.bgBubbles span:nth-child(2)  { width: 40px;  height: 40px;  left: 15%;  bottom: -60px; background: #FFBD9B; animation-duration: 14s; animation-delay: 2s; }
-.bgBubbles span:nth-child(3)  { width: 80px;  height: 80px;  left: 28%;  bottom: -100px;background: #F4845F; animation-duration: 20s; animation-delay: 4s; }
-.bgBubbles span:nth-child(4)  { width: 30px;  height: 30px;  left: 42%;  bottom: -50px; background: #FFCBA4; animation-duration: 16s; animation-delay: 1s; }
-.bgBubbles span:nth-child(5)  { width: 55px;  height: 55px;  left: 60%;  bottom: -75px; background: #F4A07A; animation-duration: 22s; animation-delay: 3s; }
-.bgBubbles span:nth-child(6)  { width: 35px;  height: 35px;  left: 72%;  bottom: -55px; background: #FFD09B; animation-duration: 15s; animation-delay: 6s; }
-.bgBubbles span:nth-child(7)  { width: 70px;  height: 70px;  left: 82%;  bottom: -90px; background: #F4705A; animation-duration: 19s; animation-delay: 2s; }
-.bgBubbles span:nth-child(8)  { width: 25px;  height: 25px;  left: 90%;  bottom: -40px; background: #FFBD9B; animation-duration: 13s; animation-delay: 5s; }
-.bgBubbles span:nth-child(9)  { width: 45px;  height: 45px;  left: 35%;  bottom: -65px; background: #F4906A; animation-duration: 17s; animation-delay: 7s; }
-.bgBubbles span:nth-child(10) { width: 50px;  height: 50px;  left: 55%;  bottom: -70px; background: #FFCBA4; animation-duration: 21s; animation-delay: 1s; }
+.bgBubbles span:nth-child(1)  { width: 60px;  height: 60px;  left: 5%;   bottom: -80px; background: #FF9AB5; animation-duration: 18s; animation-delay: 0s; }
+.bgBubbles span:nth-child(2)  { width: 40px;  height: 40px;  left: 15%;  bottom: -60px; background: #FFAFC5; animation-duration: 14s; animation-delay: 2s; }
+.bgBubbles span:nth-child(3)  { width: 80px;  height: 80px;  left: 28%;  bottom: -100px;background: #FF6B88; animation-duration: 20s; animation-delay: 4s; }
+.bgBubbles span:nth-child(4)  { width: 30px;  height: 30px;  left: 42%;  bottom: -50px; background: #FFCCD8; animation-duration: 16s; animation-delay: 1s; }
+.bgBubbles span:nth-child(5)  { width: 55px;  height: 55px;  left: 60%;  bottom: -75px; background: #FF8CA0; animation-duration: 22s; animation-delay: 3s; }
+.bgBubbles span:nth-child(6)  { width: 35px;  height: 35px;  left: 72%;  bottom: -55px; background: #FFB8CA; animation-duration: 15s; animation-delay: 6s; }
+.bgBubbles span:nth-child(7)  { width: 70px;  height: 70px;  left: 82%;  bottom: -90px; background: #FF5673; animation-duration: 19s; animation-delay: 2s; }
+.bgBubbles span:nth-child(8)  { width: 25px;  height: 25px;  left: 90%;  bottom: -40px; background: #FFAFC5; animation-duration: 13s; animation-delay: 5s; }
+.bgBubbles span:nth-child(9)  { width: 45px;  height: 45px;  left: 35%;  bottom: -65px; background: #FF7D97; animation-duration: 17s; animation-delay: 7s; }
+.bgBubbles span:nth-child(10) { width: 50px;  height: 50px;  left: 55%;  bottom: -70px; background: #FFCCD8; animation-duration: 21s; animation-delay: 1s; }
 
 @keyframes floatUp {
   0%   { transform: translateY(0) scale(1) rotate(0deg); opacity: 0; }
-  10%  { opacity: 0.35; }
-  90%  { opacity: 0.35; }
+  10%  { opacity: 0.28; }
+  90%  { opacity: 0.28; }
   100% { transform: translateY(-110vh) scale(0.8) rotate(45deg); opacity: 0; }
 }
 
@@ -60,10 +61,10 @@
   grid-template-columns: 1fr 2fr 1fr;
   align-items: center;
   padding: 10px 20px;
-  background: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(24px);
-  border-bottom: 3px solid #FFCCB3;
-  box-shadow: 0 2px 20px rgba(244,135,100,0.18);
+  border-bottom: 3px solid #FFB3C2;
+  box-shadow: 0 2px 20px rgba(255,107,136,0.15);
   flex-shrink: 0;
   min-height: 80px;
 }
@@ -73,7 +74,7 @@
   flex-direction: column;
   gap: 5px;
 }
-.dateText { font-size: 13px; font-weight: 600; color: #607D8B; }
+.dateText { font-size: 13px; font-weight: 600; color: #7D6575; }
 .headerMeta {
   display: flex;
   align-items: center;
@@ -83,11 +84,11 @@
 .classTag {
   font-size: 16px;
   font-weight: 900;
-  color: #C04E2E;
-  background: #FFF0E8;
+  color: #D94F72;
+  background: #FFF0F4;
   padding: 4px 12px;
   border-radius: 20px;
-  border: 2px solid #FFCCB3;
+  border: 2px solid #FFCCD6;
 }
 .ddayChipHeader {
   display: inline-block;
@@ -114,7 +115,7 @@
 .headerQuoteText {
   font-size: 22px;
   font-weight: 900;
-  color: #7B3520;
+  color: #3D1A2A;
   line-height: 1.4;
   font-style: italic;
   letter-spacing: -0.3px;
@@ -127,7 +128,7 @@
 }
 .headerQuoteAuthor {
   font-size: 14px;
-  color: #78909C;
+  color: #A8849A;
   margin-top: 5px;
   font-weight: 700;
   font-style: normal;
@@ -143,13 +144,13 @@
 .clockBig {
   font-size: 26px;
   font-weight: 900;
-  color: #D4512A;
+  color: #E84570;
   font-variant-numeric: tabular-nums;
 }
 .teacherBtn {
-  background: #FFF0E8;
-  color: #C04E2E;
-  border: 2px solid #FFCCB3;
+  background: #FFF0F4;
+  color: #D94F72;
+  border: 2px solid #FFCCD6;
   padding: 7px 14px;
   border-radius: 14px;
   font-size: 13px;
@@ -158,7 +159,7 @@
   cursor: pointer;
   transition: all 0.2s;
 }
-.teacherBtn:hover { background: #E8654A; color: white; transform: translateY(-2px); }
+.teacherBtn:hover { background: #FF5673; color: white; transform: translateY(-2px); }
 
 /* ─── Main Grid ─── */
 .mainGrid {
@@ -173,12 +174,12 @@
 }
 
 .panel {
-  background: rgba(255,255,255,0.86);
+  background: rgba(255,255,255,0.88);
   backdrop-filter: blur(18px);
   border-radius: 18px;
   padding: 14px 16px;
-  border: 2px solid rgba(255,200,170,0.65);
-  box-shadow: 0 4px 20px rgba(244,160,122,0.10);
+  border: 2px solid rgba(255,180,200,0.55);
+  box-shadow: 0 4px 20px rgba(255,107,136,0.09);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -187,14 +188,14 @@
 .panelTitle {
   font-size: 13px;
   font-weight: 800;
-  color: #C04E2E;
+  color: #D94F72;
   margin-bottom: 7px;
   padding-bottom: 6px;
-  border-bottom: 2px dashed #FFCCB3;
+  border-bottom: 2px dashed #FFCCD6;
   flex-shrink: 0;
 }
 
-.empty { color: #FFAB91; font-size: 14px; text-align: center; padding: 16px; }
+.empty { color: #FFAABF; font-size: 14px; text-align: center; padding: 16px; }
 
 /* ─── Announcement Panel ─── */
 .annPanel {
@@ -206,11 +207,11 @@
   overflow-y: auto; flex: 1;
 }
 .annList::-webkit-scrollbar { width: 4px; }
-.annList::-webkit-scrollbar-thumb { background: #FFCCB3; border-radius: 2px; }
+.annList::-webkit-scrollbar-thumb { background: #FFCCD6; border-radius: 2px; }
 
 .annCard {
-  background: #FFF8F3;
-  border: 2px solid #FFCCB3;
+  background: #FFF8FA;
+  border: 2px solid #FFCCD6;
   border-radius: 14px;
   padding: 12px 14px;
 }
@@ -230,10 +231,10 @@
   margin-bottom: 6px;
 }
 .annTitle {
-  font-size: 17px; font-weight: 800; color: #7B3520; line-height: 1.3;
+  font-size: 17px; font-weight: 800; color: #3D1A2A; line-height: 1.3;
 }
 .annBody {
-  font-size: 13px; color: #607D8B; margin-top: 4px; line-height: 1.4;
+  font-size: 13px; color: #7D6575; margin-top: 4px; line-height: 1.4;
 }
 
 /* ─── Education + Photo Panel (가운데, 상하 분할) ─── */
@@ -260,7 +261,7 @@
 .eduDivider {
   height: 2px;
   flex-shrink: 0;
-  background: linear-gradient(90deg, transparent, #FFCCB3, #FFAB91, #FFCCB3, transparent);
+  background: linear-gradient(90deg, transparent, #FFCCD6, #FF9AB5, #FFCCD6, transparent);
   margin: 0 16px;
 }
 
@@ -281,7 +282,7 @@
   border-radius: 14px;
   overflow: hidden;
   min-height: 0;
-  background: #FFF0E8;
+  background: #FFF0F4;
 }
 .photoImg {
   position: absolute; inset: 0;
@@ -296,7 +297,7 @@
 .photoCaptionBar {
   position: absolute;
   bottom: 0; left: 0; right: 0;
-  background: linear-gradient(0deg, rgba(120,60,30,0.75) 0%, transparent 100%);
+  background: linear-gradient(0deg, rgba(80,20,40,0.72) 0%, transparent 100%);
   color: white;
   padding: 20px 14px 10px;
   font-size: 13px; font-weight: 600;
@@ -316,11 +317,11 @@
   align-items: center;
   justify-content: center;
   gap: 10px;
-  color: #FFAB91;
+  color: #FFAABF;
   font-size: 13px;
-  background: rgba(255,240,230,0.4);
+  background: rgba(255,240,246,0.45);
   border-radius: 14px;
-  border: 2px dashed #FFCCB3;
+  border: 2px dashed #FFCCD6;
   text-align: center;
   padding: 20px;
 }
@@ -333,9 +334,9 @@
   gap: 8px; flex: 1; justify-content: center; padding: 8px;
 }
 .eduEmoji { font-size: 40px; }
-.eduTitle { font-size: 18px; font-weight: 800; color: #7B3520; }
+.eduTitle { font-size: 18px; font-weight: 800; color: #3D1A2A; }
 .eduBody {
-  font-size: 14px; color: #C04E2E;
+  font-size: 14px; color: #D94F72;
   white-space: pre-line; line-height: 1.6; max-width: 90%;
 }
 
@@ -382,7 +383,7 @@
   overflow: hidden;
 }
 .eduSecTitle {
-  font-size: 11.5px; font-weight: 800; color: #7B3520;
+  font-size: 11.5px; font-weight: 800; color: #3D1A2A;
   margin-bottom: 2px; flex-shrink: 0;
 }
 .eduSecList {
@@ -392,7 +393,7 @@
   flex: 1; min-height: 0; overflow: hidden;
 }
 .eduSecList li {
-  font-size: 10.5px; color: #37474F; line-height: 1.38;
+  font-size: 10.5px; color: #4A3040; line-height: 1.38;
 }
 
 .eduStats {
@@ -401,20 +402,20 @@
 .eduStatItem {
   flex: 1;
   background: rgba(255,255,255,0.85);
-  border: 1.5px solid #FFCCB3;
+  border: 1.5px solid #FFCCD6;
   border-radius: 8px; padding: 4px 6px;
   text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 1px;
 }
 .eduStatEmoji { font-size: 14px; }
-.eduStatValue { font-size: 12px; font-weight: 900; color: #D4512A; }
-.eduStatLabel { font-size: 9px; color: #607D8B; line-height: 1.3; }
+.eduStatValue { font-size: 12px; font-weight: 900; color: #E84570; }
+.eduStatLabel { font-size: 9px; color: #7D6575; line-height: 1.3; }
 
 .eduHighlight {
-  background: linear-gradient(135deg, #FFF0E8, #FFCCB3);
-  border-left: 3px solid #E8654A;
+  background: linear-gradient(135deg, #FFF0F4, #FFCCD6);
+  border-left: 3px solid #FF5673;
   padding: 4px 8px; border-radius: 7px;
-  font-size: 10px; font-weight: 700; color: #C04E2E;
+  font-size: 10px; font-weight: 700; color: #D94F72;
   flex-shrink: 0; line-height: 1.35;
 }
 
@@ -423,8 +424,8 @@
   display: flex; gap: 5px; justify-content: center;
   flex-shrink: 0; margin-top: 8px;
 }
-.dot { width: 7px; height: 7px; border-radius: 50%; background: #FFCCB3; }
-.dotActive { background: #E8654A; width: 18px; border-radius: 4px; }
+.dot { width: 7px; height: 7px; border-radius: 50%; background: #FFCCD6; }
+.dotActive { background: #FF5673; width: 18px; border-radius: 4px; }
 
 /* ─── D-day Panel ─── */
 .ddayPanel {
@@ -432,25 +433,25 @@
 }
 .ddayRow {
   display: flex; justify-content: space-between; align-items: center;
-  background: #FFF0E8; border-radius: 10px;
+  background: #FFF0F4; border-radius: 10px;
   padding: 8px 12px; margin-bottom: 6px;
 }
-.ddayTitle { font-size: 13px; font-weight: 600; color: #7B3520; }
+.ddayTitle { font-size: 13px; font-weight: 600; color: #3D1A2A; }
 .ddayNum { font-size: 18px; font-weight: 900; }
 
 /* ─── 칭찬왕 rows (eduPanel 하단) ─── */
 .top3Row {
   display: flex; align-items: center; gap: 8px;
-  background: #FFF0E8; border-radius: 12px;
+  background: #FFF0F4; border-radius: 12px;
   padding: 6px 10px; margin-bottom: 5px;
   flex-shrink: 0;
 }
 .medal { font-size: 18px; flex-shrink: 0; }
-.top3Name { font-size: 13px; font-weight: 700; color: #7B3520; min-width: 44px; flex-shrink: 0; }
+.top3Name { font-size: 13px; font-weight: 700; color: #3D1A2A; min-width: 44px; flex-shrink: 0; }
 .chickRow { display: flex; align-items: center; gap: 1px; flex: 1; overflow: hidden; flex-wrap: wrap; }
 .chickEmoji { font-size: 14px; }
-.extraChick { font-size: 10px; color: #D4512A; font-weight: 700; background: #FFF0E8; padding: 1px 5px; border-radius: 8px; }
-.top3Count { font-size: 12px; font-weight: 700; color: #D4512A; flex-shrink: 0; }
+.extraChick { font-size: 10px; color: #E84570; font-weight: 700; background: #FFF0F4; padding: 1px 5px; border-radius: 8px; }
+.top3Count { font-size: 12px; font-weight: 700; color: #E84570; flex-shrink: 0; }
 
 /* ─── 학급 사진 Panel (오른쪽 아래) ─── */
 .photoPanel {
