@@ -82,6 +82,89 @@ export default function BoardPage() {
     return () => clearInterval(t);
   }, []);
 
+  /* ── 반짝이 커서 효과 ── */
+  useEffect(() => {
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes sparklePop {
+        0%   { opacity: 1; transform: translate(-50%,-50%) scale(1) rotate(0deg); }
+        100% { opacity: 0; transform: translate(-50%, calc(-50% - 28px)) scale(0.1) rotate(40deg); }
+      }
+    `;
+    document.head.appendChild(style);
+    document.documentElement.style.cursor = 'none';
+
+    const cursor = document.createElement('div');
+    cursor.style.cssText = `
+      position:fixed; pointer-events:none; z-index:99999;
+      width:13px; height:13px;
+      background: radial-gradient(circle at 35% 35%, #FF8FAD, #E84570);
+      border-radius:50%;
+      transform:translate(-50%,-50%);
+      box-shadow: 0 0 8px rgba(232,69,112,0.9), 0 0 18px rgba(255,86,115,0.4);
+    `;
+    document.body.appendChild(cursor);
+
+    const TRAIL_COUNT = 7;
+    const trails = Array.from({ length: TRAIL_COUNT }, (_, i) => {
+      const el = document.createElement('div');
+      const size = Math.max(3, 11 - i * 1.2);
+      el.style.cssText = `
+        position:fixed; pointer-events:none; z-index:99998;
+        width:${size}px; height:${size}px;
+        background: radial-gradient(circle, #FF9AB5, #FF5673);
+        border-radius:50%;
+        transform:translate(-50%,-50%);
+        opacity:${(0.55 - i * 0.07).toFixed(2)};
+        transition: left ${(0.08 + i * 0.045).toFixed(3)}s ease,
+                    top  ${(0.08 + i * 0.045).toFixed(3)}s ease;
+      `;
+      document.body.appendChild(el);
+      return el;
+    });
+
+    const COLORS  = ['#FF5673','#FF9AB5','#E84570','#FFCCD6','#FF6B88','#FFD0DC'];
+    const SYMBOLS = ['✦','✧','⋆','★','✺','✼','❋'];
+    let lastSparkle = 0;
+
+    const spawnSparkle = (x, y) => {
+      const el = document.createElement('span');
+      el.textContent = SYMBOLS[Math.floor(Math.random() * SYMBOLS.length)];
+      const size = 10 + Math.random() * 13;
+      el.style.cssText = `
+        position:fixed; pointer-events:none; z-index:99997;
+        left:${x + (Math.random() - 0.5) * 22}px;
+        top:${y  + (Math.random() - 0.5) * 22}px;
+        font-size:${size}px;
+        color:${COLORS[Math.floor(Math.random() * COLORS.length)]};
+        transform:translate(-50%,-50%);
+        animation: sparklePop 0.75s ease-out forwards;
+        text-shadow: 0 0 5px currentColor;
+        will-change: transform, opacity;
+      `;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 750);
+    };
+
+    const onMouseMove = (e) => {
+      const { clientX: x, clientY: y } = e;
+      cursor.style.left = x + 'px';
+      cursor.style.top  = y + 'px';
+      trails.forEach(t => { t.style.left = x + 'px'; t.style.top = y + 'px'; });
+      const now = Date.now();
+      if (now - lastSparkle > 55) { spawnSparkle(x, y); lastSparkle = now; }
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', onMouseMove);
+      document.documentElement.style.cursor = '';
+      cursor.remove();
+      trails.forEach(t => t.remove());
+      style.remove();
+    };
+  }, []);
+
   /* ── 명언 (날짜 기반 시작, 20s 회전) ── */
   const quotes = db.quotes || [];
   useEffect(() => {
