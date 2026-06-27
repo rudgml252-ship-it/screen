@@ -16,15 +16,19 @@ const NAGS = [
   '🎒 가방 정리 잘 했죠?',
 ];
 
-// Pixel size — element is P×P so shadow spread is 0
+// P = element size → each "pixel" is exactly P×P with 0 spread (no overlap)
 const P  = 5;
-const __ = null;
-const BK = '#101018'; // outline
-const PK = '#F9A0B8'; // kirby pink
-const CP = '#E06080'; // cheek blush
-const RD = '#C01858'; // feet / mouth
-const WH = '#FFFFFF'; // eye white
 
+const __ = null;
+const BK = '#301808'; // dark brown outline (Kirby's oval eyes are brown, not black)
+const PK = '#F9A0B8'; // pink body
+const CP = '#EE7090'; // cheek blush
+const RD = '#CC1020'; // red feet
+const WH = '#FFFFFF'; // eye white
+const BL = '#4499CC'; // blue eye iris
+const MO = '#E85060'; // mouth interior
+
+// shadow: element is P×P, spread=0 → exact pixel fit, no overlap
 const toShadow = (grid) => {
   const s = [];
   grid.forEach((row, y) => row.forEach((c, x) => {
@@ -33,120 +37,136 @@ const toShadow = (grid) => {
   return s.join(',');
 };
 
-/* ────────────────── SPRITES (12 wide × 12 tall) ────────────────── */
-
-// Front body rows 0-7
+/* ══════════════════════════════════════════════
+   FRONT – 14 wide × 12 body rows (+ 2 leg rows)
+   ══════════════════════════════════════════════ */
 const FB = [
-  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,PK,BK,BK,PK,PK,BK,BK,PK,BK,__],
-  [BK,PK,BK,WH,BK,PK,PK,BK,WH,BK,PK,BK],
-  [BK,PK,PK,BK,BK,PK,PK,BK,BK,PK,PK,BK],
-  [BK,PK,CP,PK,PK,PK,PK,PK,CP,PK,PK,BK],
-  [BK,PK,PK,PK,BK,BK,PK,PK,PK,PK,PK,BK],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [__,__,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__], // 0
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],  // 1
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],  // 2
+  [BK,PK,PK,BK,BK,PK,PK,PK,BK,BK,PK,PK,BK,__],  // 3 eye top
+  [BK,PK,BK,WH,WH,BK,PK,BK,WH,WH,BK,PK,BK,__],  // 4 eyes (white)
+  [BK,PK,BK,WH,BL,BK,PK,BK,BL,WH,BK,PK,BK,__],  // 5 blue iris
+  [BK,PK,PK,BK,BK,PK,PK,PK,BK,BK,PK,PK,BK,__],  // 6 eye bottom
+  [BK,PK,CP,PK,PK,PK,PK,PK,PK,PK,CP,PK,BK,__],  // 7 cheeks
+  [BK,PK,PK,PK,MO,MO,MO,MO,PK,PK,PK,BK,__,__],  // 8 small closed mouth
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],  // 9
+  [PK,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,PK,__,__],  // 10 arm stubs
+  [__,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],  // 11 body bottom
 ];
-// Front mouth-open rows 0-7
+
+// Kirby with open mouth (talk pose)
 const FT = [
-  ...FB.slice(0, 5),
-  [BK,PK,CP,PK,PK,PK,PK,PK,CP,PK,PK,BK],
-  [BK,PK,PK,BK,BK,BK,BK,BK,PK,PK,PK,BK],
-  [BK,PK,RD,RD,RD,RD,RD,RD,PK,PK,PK,BK],
+  ...FB.slice(0, 8),
+  [BK,PK,PK,BK,MO,MO,MO,MO,BK,PK,PK,BK,__,__],  // 8 open mouth outline
+  [__,BK,PK,BK,MO,MO,MO,MO,BK,PK,BK,__,__,__],  // 9 open mouth interior
+  ...FB.slice(10, 12),
 ];
 
-// Back body rows 0-7
+/* ══════════════════════════════════════════════
+   BACK – same shape, no face
+   ══════════════════════════════════════════════ */
 const BB = [
-  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK],
-  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [__,__,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__],
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],
+  [PK,BK,PK,PK,PK,PK,PK,PK,PK,PK,BK,PK,__,__],
+  [__,BK,BK,BK,BK,BK,BK,BK,BK,BK,BK,__,__,__],
 ];
 
-// Left body rows 0-7 (right = CSS scaleX(-1) of left)
+/* ══════════════════════════════════════════════
+   LEFT – round profile, one eye visible
+   (right direction uses CSS scaleX(-1))
+   ══════════════════════════════════════════════ */
 const LB = [
-  [__,__,BK,BK,BK,BK,BK,BK,__,__,__,__],
-  [__,BK,PK,PK,PK,PK,PK,PK,BK,__,__,__],
-  [BK,PK,PK,BK,BK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,BK,WH,BK,PK,PK,PK,PK,PK,BK,__],
-  [BK,PK,PK,BK,BK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,CP,PK,PK,PK,PK,PK,PK,BK,__,__],
-  [BK,PK,PK,BK,PK,PK,PK,PK,BK,__,__,__],
-  [__,BK,PK,PK,PK,PK,PK,BK,__,__,__,__],
+  [__,__,BK,BK,BK,BK,BK,BK,BK,__,__,__,__,__],  // 0
+  [__,BK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__,__],  // 1
+  [BK,PK,PK,PK,PK,PK,PK,PK,PK,PK,BK,__,__,__],  // 2
+  [BK,PK,PK,BK,BK,PK,PK,PK,PK,PK,BK,__,__,__],  // 3 eye top
+  [BK,PK,BK,WH,WH,BK,PK,PK,PK,BK,__,__,__,__],  // 4 eye white
+  [BK,PK,BK,WH,BL,BK,PK,PK,BK,__,__,__,__,__],  // 5 blue iris
+  [BK,PK,PK,BK,BK,PK,PK,PK,BK,__,__,__,__,__],  // 6 eye bottom
+  [BK,PK,CP,PK,PK,PK,PK,PK,BK,__,__,__,__,__],  // 7 cheek
+  [BK,PK,PK,PK,MO,PK,PK,BK,__,__,__,__,__,__],  // 8 mouth (profile)
+  [__,BK,PK,PK,PK,PK,PK,BK,__,__,__,__,__,__],  // 9
+  [PK,BK,PK,PK,PK,PK,PK,BK,PK,__,__,__,__,__],  // 10 arm stubs (front+back)
+  [__,BK,BK,BK,BK,BK,BK,BK,__,__,__,__,__,__],  // 11 body bottom (flush to feet)
 ];
 
-// Shared leg sets (rows 8-11, 12 wide)
-const LEG_IDLE = [
-  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
-  [__,BK,BK,RD,RD,BK,BK,RD,RD,BK,BK,__],
-  [__,__,BK,RD,RD,BK,BK,RD,RD,BK,__,__],
-  [__,__,__,BK,BK,__,__,BK,BK,__,__,__],
+/* ══════════════════════════════════════════════
+   LEGS rows 12-13 (front/back – symmetric)
+   ══════════════════════════════════════════════ */
+// idle – feet together under body
+const LEG_I = [
+  [__,__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__,__],
+  [__,__,__,BK,BK,__,__,__,BK,BK,__,__,__,__],
 ];
-const LEG_W1 = [
-  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
-  [BK,BK,RD,RD,BK,__,__,BK,RD,RD,BK,BK],
-  [BK,RD,RD,BK,__,__,__,__,BK,RD,RD,BK],
-  [__,BK,BK,__,__,__,__,__,__,BK,BK,__],
+// walk A – feet spread wide
+const LEG_A = [
+  [__,BK,RD,RD,BK,__,__,__,__,BK,RD,RD,BK,__],
+  [__,__,BK,BK,__,__,__,__,__,__,BK,BK,__,__],
 ];
-const LEG_W2 = [
-  [__,BK,PK,PK,BK,__,__,BK,PK,PK,BK,__],
-  [__,BK,BK,RD,RD,BK,BK,RD,RD,BK,BK,__],
-  [BK,RD,RD,BK,BK,__,__,BK,BK,RD,RD,BK],
-  [__,BK,BK,__,__,__,__,__,__,BK,BK,__],
-];
-
-// Left-specific legs (character occupies left half of sprite)
-const LL_IDLE = [
-  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
-  [BK,RD,RD,BK,__,__,BK,RD,RD,BK,__,__],
-  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__],
-  [__,__,BK,BK,__,__,__,BK,BK,__,__,__],
-];
-const LL_W1 = [
-  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
-  [BK,RD,RD,BK,__,__,__,BK,RD,RD,BK,__],
-  [BK,RD,RD,BK,__,__,BK,RD,RD,BK,__,__],
-  [__,BK,BK,__,__,__,__,BK,BK,__,__,__],
-];
-const LL_W2 = [
-  [BK,PK,BK,__,__,__,__,BK,PK,PK,BK,__],
-  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__],
-  [BK,RD,RD,BK,__,__,__,BK,RD,RD,BK,__],
-  [__,BK,BK,__,__,__,__,__,BK,BK,__,__],
+// walk B – feet cross under centre
+const LEG_B = [
+  [__,__,__,BK,RD,RD,BK,RD,RD,BK,__,__,__,__],
+  [__,__,__,__,BK,RD,BK,RD,BK,__,__,__,__,__],
 ];
 
-/* precompute all shadow strings once */
-const SH_MAP = {
-  front_idle: toShadow([...FB, ...LEG_IDLE]),
-  front_talk: toShadow([...FT, ...LEG_IDLE]),
-  front_0:    toShadow([...FB, ...LEG_W1]),
-  front_1:    toShadow([...FB, ...LEG_W2]),
-  back_idle:  toShadow([...BB, ...LEG_IDLE]),
-  back_0:     toShadow([...BB, ...LEG_W1]),
-  back_1:     toShadow([...BB, ...LEG_W2]),
-  left_idle:  toShadow([...LB, ...LL_IDLE]),
-  left_0:     toShadow([...LB, ...LL_W1]),
-  left_1:     toShadow([...LB, ...LL_W2]),
+/* ══════════════════════════════════════════════
+   LEGS rows 12-13 (left/right side view)
+   ══════════════════════════════════════════════ */
+// idle – near+far foot visible, snug under body
+const LL_I = [
+  [__,__,BK,RD,RD,BK,BK,RD,BK,__,__,__,__,__],
+  [__,__,__,BK,BK,__,__,BK,__,__,__,__,__,__],
+];
+// walk A – feet spread
+const LL_A = [
+  [__,BK,RD,RD,BK,__,BK,RD,RD,BK,__,__,__,__],
+  [__,__,BK,BK,__,__,__,BK,BK,__,__,__,__,__],
+];
+// walk B – feet cross
+const LL_B = [
+  [__,__,BK,RD,BK,BK,RD,RD,BK,__,__,__,__,__],
+  [__,__,__,BK,__,__,BK,BK,__,__,__,__,__,__],
+];
+
+/* precompute all shadow strings once at module load */
+const SH = {
+  front_idle: toShadow([...FB, ...LEG_I]),
+  front_talk: toShadow([...FT, ...LEG_I]),
+  front_0:    toShadow([...FB, ...LEG_A]),
+  front_1:    toShadow([...FB, ...LEG_B]),
+  back_idle:  toShadow([...BB, ...LEG_I]),
+  back_0:     toShadow([...BB, ...LEG_A]),
+  back_1:     toShadow([...BB, ...LEG_B]),
+  left_idle:  toShadow([...LB, ...LL_I]),
+  left_0:     toShadow([...LB, ...LL_A]),
+  left_1:     toShadow([...LB, ...LL_B]),
 };
 
-const CW = 12 * P; // 60px
-const CH = 12 * P; // 60px
+const CW = 14 * P; // 70px
+const CH = 14 * P; // 70px
 
-/* star particles that pop out when Kirby stops */
 function spawnStar(cx, cy) {
-  const syms = ['⭐', '✦', '★', '✨', '💫'];
+  const syms = ['⭐','✦','★','✨','💫'];
   const el = document.createElement('span');
   el.textContent = syms[Math.floor(Math.random() * syms.length)];
   const sz = 13 + Math.random() * 10;
-  const dx = (Math.random() - 0.5) * 60;
-  el.style.cssText = `
-    position:fixed;pointer-events:none;z-index:499;
-    left:${cx + dx}px;top:${cy}px;font-size:${sz}px;
-    animation:kirbyStar 1.1s ease-out forwards;
-  `;
+  el.style.cssText = [
+    'position:fixed;pointer-events:none;z-index:499;',
+    `left:${cx + (Math.random() - 0.5) * 64}px;`,
+    `top:${cy + (Math.random() - 0.5) * 20}px;`,
+    `font-size:${sz}px;`,
+    'animation:kirbyStar 1.1s ease-out forwards;',
+  ].join('');
   document.body.appendChild(el);
   setTimeout(() => el.remove(), 1100);
 }
@@ -163,15 +183,15 @@ export default function TeacherAvatar() {
     const style = document.createElement('style');
     style.textContent = `@keyframes kirbyStar {
       0%   { opacity:1; transform:translate(-50%,-50%) scale(1) rotate(0deg); }
-      100% { opacity:0; transform:translate(-50%,calc(-50% - 60px)) scale(0.15) rotate(30deg); }
+      100% { opacity:0; transform:translate(-50%,calc(-50% - 65px)) scale(0.1) rotate(30deg); }
     }`;
     document.head.appendChild(style);
 
     const s = {
-      x: 200, y: 200,
+      x: 220, y: 200,
       vx: 1.0, vy: 0.45,
       dir: 'right', frame: 0,
-      // phases: walk → talk_pre → talk → idle_out → walk
+      // phase: walk → talk_pre (mouth opens) → talk (bubble) → idle_out → walk
       phase: 'walk',
       nagVisible: false, nagIdx: 0,
       frameTimer: 0,
@@ -198,13 +218,14 @@ export default function TeacherAvatar() {
         if (s.y > my) { s.vy = -Math.abs(s.vy); s.y = my; }
 
         const ax = Math.abs(s.vx), ay = Math.abs(s.vy);
-        s.dir = ax >= ay ? (s.vx > 0 ? 'right' : 'left') : (s.vy > 0 ? 'front' : 'back');
+        s.dir = ax >= ay ? (s.vx > 0 ? 'right' : 'left')
+                         : (s.vy > 0 ? 'front' : 'back');
 
         s.frameTimer += dt;
-        if (s.frameTimer > 200) { s.frame ^= 1; s.frameTimer = 0; }
+        if (s.frameTimer > 210) { s.frame ^= 1; s.frameTimer = 0; }
 
         s.walkTimer += dt;
-        if (s.walkTimer > 2600 + Math.random() * 2800) {
+        if (s.walkTimer > 2500 + Math.random() * 2700) {
           s.phase = 'talk_pre';
           s.dir = 'front'; s.frame = 0;
           s.nagTimer = 0; s.walkTimer = 0; s.bounceT = 0;
@@ -241,8 +262,8 @@ export default function TeacherAvatar() {
         }
       }
 
-      // Kirby bob while walking
-      const yOff = s.phase === 'walk' ? Math.sin(s.bounceT * 0.014) * 3 : 0;
+      // Kirby bounce while walking
+      const yOff = s.phase === 'walk' ? Math.sin(s.bounceT * 0.013) * 3 : 0;
       if (containerRef.current)
         containerRef.current.style.transform = `translate(${s.x}px,${Math.round(s.y + yOff)}px)`;
 
@@ -258,7 +279,7 @@ export default function TeacherAvatar() {
           key = `${lr}_idle`;
         }
         wrapperRef.current.style.transform = s.dir === 'right' ? 'scaleX(-1)' : 'none';
-        pixelRef.current.style.boxShadow   = SH_MAP[key] || SH_MAP.front_idle;
+        pixelRef.current.style.boxShadow   = SH[key] || SH.front_idle;
       }
 
       if (bubbleRef.current)
@@ -308,7 +329,7 @@ export default function TeacherAvatar() {
         <span style={{ position:'absolute', bottom:-7,  left:'50%', transform:'translateX(-50%)', display:'block', width:0, height:0, borderLeft:'5px solid transparent', borderRight:'5px solid transparent', borderTop:'8px solid #fff' }} />
       </div>
 
-      {/* 픽셀 커비 */}
+      {/* 픽셀 커비 — element is P×P so each shadow is exactly P×P (no overlap) */}
       <div ref={wrapperRef} style={{ width: CW, height: CH, position: 'relative' }}>
         <div ref={pixelRef} style={{ width: P, height: P, position: 'absolute', top: 0, left: 0 }} />
       </div>
