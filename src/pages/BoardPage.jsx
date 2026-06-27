@@ -211,62 +211,49 @@ export default function BoardPage() {
           </div>
         </section>
 
-        {/* ── 가운데: 교육자료(위 2/3) + 칭찬왕(아래 1/3) ── */}
+        {/* ── 가운데: 오늘의 교육 (전체) ── */}
         <section className={`${styles.panel} ${styles.eduPanel}`}>
-
-          {/* 위: 교육자료 (더 크게) */}
-          <div className={styles.eduTop}>
-            <div className={styles.panelTitle}>📚 오늘의 교육</div>
-            {currentEdu
-              ? <EduCard data={currentEdu} />
-              : <div className={styles.empty}>📖 교육 자료가 없어요.</div>
-            }
-            <div className={styles.cardDots}>
-              {eduCards.map((_, i) => (
-                <span key={i} className={`${styles.dot} ${i === eduIdx ? styles.dotActive : ''}`} />
-              ))}
-            </div>
+          <div className={styles.panelTitle}>📚 오늘의 교육</div>
+          {currentEdu
+            ? <EduCard data={currentEdu} />
+            : <div className={styles.empty}>📖 교육 자료가 없어요.</div>
+          }
+          <div className={styles.cardDots}>
+            {eduCards.map((_, i) => (
+              <span key={i} className={`${styles.dot} ${i === eduIdx ? styles.dotActive : ''}`} />
+            ))}
           </div>
+        </section>
 
-          {/* 구분선 */}
-          <div className={styles.eduDivider} />
+        {/* ── 오른쪽 위: D-day + 칭찬왕 ── */}
+        <div className={styles.rightTopStack}>
+          <section className={`${styles.panel} ${styles.ddayPanel}`}>
+            <div className={styles.panelTitle}>📆 D-day</div>
+            {sortedDdays.slice(0, 3).map(d => (
+              <div key={d.id} className={styles.ddayRow}>
+                <span className={styles.ddayTitle}>{d.title}</span>
+                <span className={styles.ddayNum} style={{ color: d.diff < 0 ? '#A8849A' : d.diff <= 3 ? '#FF4757' : '#D94F72' }}>
+                  {d.diff < 0 ? `D+${Math.abs(d.diff)}` : d.diff === 0 ? 'D-Day' : `D-${d.diff}`}
+                </span>
+              </div>
+            ))}
+            {sortedDdays.length === 0 && <div className={styles.empty}>예정된 일정 없음</div>}
+          </section>
 
-          {/* 아래: 칭찬 TOP3 */}
-          <div className={styles.top3Bottom}>
+          <section className={`${styles.panel} ${styles.top3Panel}`}>
             <div className={styles.panelTitle}>🏆 이번 주 칭찬 왕</div>
             {top3.map((s, i) => {
               const medals = ['🥇', '🥈', '🥉'];
-              const chickCount = Math.min(s.stamps.total, 30);
               return (
                 <div key={s.id} className={styles.top3Row}>
                   <span className={styles.medal}>{medals[i]}</span>
                   <span className={styles.top3Name}>{s.name}</span>
-                  <div className={styles.chickRow}>
-                    {Array.from({ length: chickCount }).map((_, ci) => (
-                      <span key={ci} className={styles.chickEmoji}>🐥</span>
-                    ))}
-                  </div>
                   <span className={styles.top3Count}>{s.stamps.total}개</span>
                 </div>
               );
             })}
-          </div>
-
-        </section>
-
-        {/* ── 오른쪽 위: D-day ── */}
-        <section className={`${styles.panel} ${styles.ddayPanel}`}>
-          <div className={styles.panelTitle}>📆 D-day</div>
-          {sortedDdays.slice(0, 5).map(d => (
-            <div key={d.id} className={styles.ddayRow}>
-              <span className={styles.ddayTitle}>{d.title}</span>
-              <span className={styles.ddayNum} style={{ color: d.diff < 0 ? '#A8849A' : d.diff <= 3 ? '#FF4757' : '#D94F72' }}>
-                {d.diff < 0 ? `D+${Math.abs(d.diff)}` : d.diff === 0 ? 'D-Day' : `D-${d.diff}`}
-              </span>
-            </div>
-          ))}
-          {sortedDdays.length === 0 && <div className={styles.empty}>예정된 일정 없음</div>}
-        </section>
+          </section>
+        </div>
 
         {/* ── 오른쪽 아래: 학급 사진 ── */}
         <section className={`${styles.panel} ${styles.photoPanel}`}>
