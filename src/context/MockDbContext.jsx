@@ -121,7 +121,7 @@ const defaultData = {
         },
       ],
       highlightText: '💡 "고마워", "미안해" 이 두 마디가 우리 반을 행복하게 만들어요!',
-      stats: [{ emoji: '⏱️', value: '3초', label: '말하기 전 생각 시간' }],
+      stats: [],
     },
     {
       id: 'edu_3',
@@ -281,7 +281,8 @@ export const MockDbProvider = ({ children }) => {
         const needsUpdate = parsed.educationCards?.some(c =>
           c.stats?.some(s => s.value === '117' || s.value === '119') ||
           c.sections?.some(sec => sec.items?.some(i => i.includes('117') || i.includes('117chat')))
-        ) || parsed.educationCards?.[0]?.sections?.[1]?.icon !== '🏫';
+        ) || parsed.educationCards?.[0]?.sections?.[1]?.icon !== '🏫'
+          || (parsed.educationCards?.[1]?.stats?.length > 0);
         if (needsUpdate) {
           parsed.educationCards = defaultData.educationCards;
         }
