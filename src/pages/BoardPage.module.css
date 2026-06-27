@@ -256,15 +256,15 @@
   overflow: hidden;
   min-height: 0;
 }
-.ddayPanel  { flex: 1; min-height: 0; overflow: hidden; padding: 10px 12px; }
-.top3Panel  { flex: 1; min-height: 0; overflow: hidden; padding: 10px 12px; }
+.ddayPanel  { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
+.top3Panel  { flex: 1; min-height: 0; overflow: hidden; padding: 8px 10px; }
 
 /* 오른쪽 패널 타이틀 - 컴팩트 */
 .ddayPanel .panelTitle,
 .top3Panel .panelTitle {
-  font-size: 12px;
-  margin-bottom: 5px;
-  padding-bottom: 4px;
+  font-size: 11px;
+  margin-bottom: 4px;
+  padding-bottom: 3px;
 }
 
 /* 사진 슬라이드 컨테이너 */
@@ -433,14 +433,14 @@
 
 /* ─── 칭찬왕 rows (오른쪽 패널) ─── */
 .top3Row {
-  display: flex; align-items: center; gap: 8px;
-  background: #FFF0F4; border-radius: 10px;
-  padding: 7px 10px; margin-bottom: 4px;
+  display: flex; align-items: center; gap: 6px;
+  background: #FFF0F4; border-radius: 9px;
+  padding: 5px 8px; margin-bottom: 3px;
   flex-shrink: 0;
 }
-.medal { font-size: 18px; flex-shrink: 0; }
-.top3Name { font-size: 13px; font-weight: 700; color: #3D1A2A; flex: 1; }
-.top3Count { font-size: 13px; font-weight: 900; color: #E84570; flex-shrink: 0; }
+.medal { font-size: 15px; flex-shrink: 0; }
+.top3Name { font-size: 12px; font-weight: 700; color: #3D1A2A; flex: 1; }
+.top3Count { font-size: 12px; font-weight: 900; color: #E84570; flex-shrink: 0; }
 
 /* ─── 학급 사진 Panel (오른쪽 아래) ─── */
 .photoPanel {
