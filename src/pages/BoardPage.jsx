@@ -2,6 +2,13 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMockDb } from '../context/MockDbContext';
 import styles from './BoardPage.module.css';
+import Footer from '../components/Footer';
+
+const maskName = (name) => {
+  if (!name || name.length <= 1) return name;
+  if (name.length === 2) return name[0] + '●';
+  return name[0] + '●'.repeat(name.length - 2) + name[name.length - 1];
+};
 
 /* ── helpers ── */
 const getDday = (targetDate) => {
@@ -326,7 +333,7 @@ export default function BoardPage() {
               return (
                 <div key={s.id} className={styles.top3Row}>
                   <span className={styles.medal}>{medals[i]}</span>
-                  <span className={styles.top3Name}>{s.name}</span>
+                  <span className={styles.top3Name}>{maskName(s.name)}</span>
                   <span className={styles.top3Count}>{s.stamps.total}개</span>
                 </div>
               );
@@ -361,6 +368,8 @@ export default function BoardPage() {
         </section>
 
       </main>
+
+      <Footer />
 
       {showPwModal && (
         <div className={styles.pwOverlay} onClick={() => setShowPwModal(false)}>
