@@ -89,8 +89,9 @@ export default function BoardPage() {
     return () => clearInterval(t);
   }, []);
 
-  /* ── 반짝이 커서 효과 ── */
+  /* ── 반짝이 커서 효과 (터치 기기 제외) ── */
   useEffect(() => {
+    if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
     const style = document.createElement('style');
     style.textContent = `
       @keyframes sparklePop {

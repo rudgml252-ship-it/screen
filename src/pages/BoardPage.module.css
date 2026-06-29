@@ -502,3 +502,52 @@
   cursor: pointer; transition: background 0.2s;
 }
 .pwCancelBtn:hover { background: #FFE0E9; }
+
+/* ═══════════════════════════════════════
+   📱 모바일 반응형 (≤768px)
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* 헤더: 2열로 축소, 명언 숨김 */
+  .header {
+    grid-template-columns: 1fr auto;
+    min-height: auto;
+    padding: 8px 14px;
+    gap: 0;
+  }
+  .headerCenter { display: none; }
+  .headerRight { gap: 8px; }
+  .clockBig { font-size: 20px; }
+  .teacherBtn { padding: 6px 10px; font-size: 12px; }
+  .classTag { font-size: 13px; padding: 3px 9px; }
+  .dateText { font-size: 11px; }
+  .ddayChipHeader { font-size: 11px; padding: 3px 8px; }
+
+  /* 메인 그리드: 1열 수직 스택, 스크롤 */
+  .mainGrid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 8px;
+    gap: 8px;
+  }
+
+  /* 각 패널 grid 위치 해제 → 자연 순서로 */
+  .annPanel     { grid-column: 1; grid-row: auto; max-height: 280px; }
+  .eduPanel     { grid-column: 1; grid-row: auto; min-height: 260px; }
+  .rightTopStack{ grid-column: 1; grid-row: auto; flex-direction: row; max-height: 160px; }
+  .photoPanel   { grid-column: 1; grid-row: auto; min-height: 220px; }
+
+  /* 패널 내부 폰트 축소 */
+  .annTitle { font-size: 14px; }
+  .annBody  { font-size: 12px; }
+
+  /* D-Day & TOP3 가로 배치 */
+  .ddayPanel, .top3Panel { flex: 1; min-height: 0; }
+  .ddayRow, .top3Row { height: 26px; }
+  .ddayTitle, .top3Name { font-size: 11px; }
+
+  /* 비밀번호 모달 */
+  .pwModal { width: 90%; max-width: 320px; padding: 28px 24px; }
+}

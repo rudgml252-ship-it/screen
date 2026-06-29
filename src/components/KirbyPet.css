@@ -166,6 +166,12 @@
   100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
 }
 
+/* 터치/모바일 기기에서 커비 숨김 */
+@media (max-width: 768px), (pointer: coarse) {
+  .kirby-pet-wrapper,
+  .kirby-trail-layer { display: none !important; }
+}
+
 /* ── 별 이펙트 ── */
 .kirby-stars {
   position: absolute;
