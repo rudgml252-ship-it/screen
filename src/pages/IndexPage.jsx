@@ -83,10 +83,10 @@ function GuideModal({ onClose }) {
                 ['📖', '오늘의 교육','교육자료 카드 순환 표시'],
               ].map(([icon, name, desc]) => (
                 <div key={name} className={styles.featureCard}>
-                  <span className={styles.featureIcon}>{icon}</span>
+                  <span className={styles.featureCardIcon}>{icon}</span>
                   <div>
-                    <div className={styles.featureName}>{name}</div>
-                    <div className={styles.featureDesc}>{desc}</div>
+                    <div className={styles.featureCardName}>{name}</div>
+                    <div className={styles.featureCardDesc}>{desc}</div>
                   </div>
                 </div>
               ))}
