@@ -7,7 +7,6 @@ const gid = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 99
 
 // ── Firestore 동기화 대상 필드 (너무 큰 정적 데이터 제외) ──
 const LOCAL_ONLY_FIELDS = new Set(['quotes', 'educationCards', 'photos']);
-const FIRESTORE_DOC = 'class-1';
 
 function extractSyncable(db) {
   const out = {};
@@ -322,13 +321,14 @@ const defaultData = {
   timer: { running: false, remaining: 25 * 60, mode: 'FOCUS', label: '집중 시간' },
 };
 
-export const MockDbProvider = ({ children }) => {
+export const MockDbProvider = ({ children, classId = 'class-1' }) => {
+  const LOCAL_KEY = `classboard_v2_${classId}`;
   const fromFirestoreRef  = useRef(false);
   const fbSyncTimerRef    = useRef(null);
 
   const [db, setDb] = useState(() => {
     try {
-      const saved = localStorage.getItem('classboard_v2');
+      const saved = localStorage.getItem(LOCAL_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         // 교육카드 구버전 마이그레이션
@@ -375,20 +375,20 @@ export const MockDbProvider = ({ children }) => {
   });
 
   useEffect(() => {
-    localStorage.setItem('classboard_v2', JSON.stringify(db));
+    localStorage.setItem(LOCAL_KEY, JSON.stringify(db));
     const onStorage = (e) => {
-      if (e.key === 'classboard_v2' && e.newValue) {
+      if (e.key === LOCAL_KEY && e.newValue) {
         try { setDb(JSON.parse(e.newValue)); } catch (e) { }
       }
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [db]);
+  }, [db, LOCAL_KEY]);
 
   // ── Firebase: 실시간 수신 ──
   useEffect(() => {
     if (!FIREBASE_ENABLED) return;
-    const ref = doc(firestoreDb, 'classes', FIRESTORE_DOC);
+    const ref = doc(firestoreDb, 'classes', classId);
     const unsub = onSnapshot(ref, (snap) => {
       if (!snap.exists()) return;
       fromFirestoreRef.current = true;
@@ -397,7 +397,7 @@ export const MockDbProvider = ({ children }) => {
       console.warn('[Firebase] onSnapshot 오류:', err.message);
     });
     return unsub;
-  }, []);
+  }, [classId]);
 
   // ── Firebase: 변경 시 동기화 (로컬 변경만, 수신된 변경 제외) ──
   useEffect(() => {
@@ -408,13 +408,13 @@ export const MockDbProvider = ({ children }) => {
     }
     clearTimeout(fbSyncTimerRef.current);
     fbSyncTimerRef.current = setTimeout(() => {
-      const ref = doc(firestoreDb, 'classes', FIRESTORE_DOC);
+      const ref = doc(firestoreDb, 'classes', classId);
       setDoc(ref, extractSyncable(db), { merge: true }).catch(
         err => console.warn('[Firebase] 쓰기 오류:', err.message)
       );
     }, 800);
     return () => clearTimeout(fbSyncTimerRef.current);
-  }, [db]);
+  }, [db, classId]);
 
   const addAnnouncement = useCallback((ann) => setDb(prev => ({
     ...prev, announcements: [{ ...ann, id: gid('ann'), createdAt: Date.now(), updatedAt: Date.now() }, ...prev.announcements]
@@ -581,11 +581,11 @@ export const MockDbProvider = ({ children }) => {
     ...prev, classInfo: { ...prev.classInfo, ...info }
   })), []);
 
-  const resetDb = useCallback(() => { localStorage.removeItem('classboard_v2'); setDb(defaultData); }, []);
+  const resetDb = useCallback(() => { localStorage.removeItem(LOCAL_KEY); setDb(defaultData); }, [LOCAL_KEY]);
 
   return (
     <MockDbContext.Provider value={{
-      db, setDb,
+      db, setDb, classId,
       addAnnouncement, deleteAnnouncement,
       addStamp,
       addStudent, deleteStudent, renameStudent,
