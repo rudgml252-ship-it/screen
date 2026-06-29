@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>🔍 커비 스프라이트 좌표 측정기</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #1a1a2e; color: #eee; font-family: monospace; padding: 16px; }
+    h1 { color: #FFD700; font-size: 18px; margin-bottom: 12px; }
+
+    .controls {
+      display: flex; gap: 12px; align-items: center;
+      margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .controls label { color: #aaa; font-size: 13px; }
+    .controls input[type=number] {
+      width: 70px; padding: 4px 6px;
+      background: #2a2a4a; border: 1px solid #555; color: #fff;
+      border-radius: 4px; font-family: monospace;
+    }
+    .btn {
+      padding: 6px 14px; border: none; border-radius: 4px;
+      cursor: pointer; font-family: monospace; font-weight: bold;
+    }
+    .btn-clear { background: #c0392b; color: #fff; }
+    .btn-copy  { background: #27ae60; color: #fff; }
+
+    .info-bar {
+      display: flex; gap: 20px; margin-bottom: 10px;
+      background: #0d0d1e; padding: 10px 14px; border-radius: 6px;
+      flex-wrap: wrap;
+    }
+    .info-item { font-size: 13px; }
+    .info-item span { color: #FFD700; font-weight: bold; }
+
+    .canvas-wrap {
+      position: relative; display: inline-block;
+      border: 2px solid #555; cursor: crosshair;
+    }
+    canvas { display: block; image-rendering: pixelated; }
+
+    /* 격자 오버레이 캔버스 */
+    #overlay {
+      position: absolute; top: 0; left: 0;
+      pointer-events: none;
+    }
+
+    .frames-list {
+      margin-top: 14px; background: #0d0d1e;
+      border-radius: 6px; padding: 12px;
+      max-height: 300px; overflow-y: auto;
+    }
+    .frames-list h2 { color: #FF8FAB; font-size: 14px; margin-bottom: 8px; }
+    .frame-entry {
+      font-size: 12px; margin-bottom: 4px;
+      display: flex; gap: 8px; align-items: center;
+    }
+    .frame-entry .tag {
+      background: #2a2a4a; padding: 2px 8px;
+      border-radius: 3px; color: #7EC8E3;
+    }
+    .frame-entry .coords { color: #98FB98; }
+    .frame-entry .remove {
+      color: #c0392b; cursor: pointer; font-size: 11px;
+      border: none; background: none; color: #FF6B6B;
+    }
+
+    .output-box {
+      margin-top: 14px; background: #0a0a1a;
+      border-radius: 6px; padding: 12px;
+      border: 1px solid #333;
+    }
+    .output-box h2 { color: #FFD700; font-size: 13px; margin-bottom: 8px; }
+    pre { font-size: 11px; color: #98FB98; white-space: pre-wrap; word-break: break-all; }
+
+    .hint { color: #888; font-size: 12px; margin-bottom: 8px; }
+    .zoom-preview {
+      position: fixed; right: 20px; top: 20px;
+      background: #0d0d1e; border: 2px solid #FFD700;
+      border-radius: 8px; padding: 8px;
+      display: none;
+    }
+    .zoom-preview.active { display: block; }
+    .zoom-preview canvas { border: 1px solid #555; }
+    .zoom-preview p { font-size: 11px; color: #aaa; margin-top: 4px; text-align: center; }
+  </style>
+</head>
+<body>
+<h1>🔍 커비 스프라이트 좌표 측정기</h1>
+
+<div class="controls">
+  <label>프레임 W: <input type="number" id="fw" value="64" min="8" max="256"></label>
+  <label>프레임 H: <input type="number" id="fh" value="64" min="8" max="256"></label>
+  <label>줌: <input type="number" id="zoom" value="1" min="0.25" max="3" step="0.25"></label>
+  <button class="btn btn-clear" onclick="clearFrames()">🗑 초기화</button>
+  <button class="btn btn-copy" onclick="copyOutput()">📋 코드 복사</button>
+</div>
+
+<div class="hint">
+  🖱 이미지 위에서 <b>마우스 이동</b> → 좌표 확인 / <b>클릭</b> → 프레임 좌상단 기록<br>
+  기록한 프레임들이 아래에 자동으로 코드로 생성돼요!
+</div>
+
+<div class="info-bar">
+  <div class="info-item">이미지 크기: <span id="imgSize">-</span></div>
+  <div class="info-item">마우스 X: <span id="mx">0</span></div>
+  <div class="info-item">마우스 Y: <span id="my">0</span></div>
+  <div class="info-item">CSS bg-pos X: <span id="bgx">0</span>px</div>
+  <div class="info-item">CSS bg-pos Y: <span id="bgy">0</span>px</div>
+  <div class="info-item">프레임 격자: <span id="gridPos">-</span></div>
+</div>
+
+<div class="canvas-wrap" id="canvasWrap">
+  <canvas id="main"></canvas>
+  <canvas id="overlay"></canvas>
+</div>
+
+<div class="zoom-preview" id="zoomPrev">
+  <canvas id="zoomCanvas" width="128" height="128"></canvas>
+  <p>4x 확대 미리보기</p>
+</div>
+
+<div class="frames-list">
+  <h2>📌 기록된 프레임 목록 (<span id="frameCount">0</span>개)</h2>
+  <div id="frameList"></div>
+</div>
+
+<div class="output-box">
+  <h2>💻 생성된 좌표 코드</h2>
+  <pre id="codeOutput">// 이미지 위를 클릭하면 여기에 코드가 생성됩니다!</pre>
+</div>
+
+<script>
+const mainCanvas  = document.getElementById('main');
+const overlayCanvas = document.getElementById('overlay');
+const zoomCanvas  = document.getElementById('zoomCanvas');
+const mainCtx     = mainCanvas.getContext('2d');
+const overlayCtx  = overlayCanvas.getContext('2d');
+const zoomCtx     = zoomCanvas.getContext('2d');
+
+let img = null;
+let frames = [];
+let mouseX = 0, mouseY = 0;
+let zoom = 1;
+
+// ── 이미지 로드 ──
+function loadImage(src) {
+  img = new Image();
+  img.onload = () => {
+    document.getElementById('imgSize').textContent = `${img.naturalWidth} × ${img.naturalHeight} px`;
+    redraw();
+  };
+  img.onerror = () => alert('이미지 로드 실패! 파일명을 확인해주세요.');
+  img.src = src;
+}
+loadImage('/kirby.png');
+
+function getZoom() { return parseFloat(document.getElementById('zoom').value) || 1; }
+function getFW() { return parseInt(document.getElementById('fw').value) || 64; }
+function getFH() { return parseInt(document.getElementById('fh').value) || 64; }
+
+function redraw() {
+  if (!img) return;
+  zoom = getZoom();
+  const w = Math.round(img.naturalWidth  * zoom);
+  const h = Math.round(img.naturalHeight * zoom);
+  mainCanvas.width = overlayCanvas.width = w;
+  mainCanvas.height = overlayCanvas.height = h;
+
+  // 배경 (체커보드)
+  mainCtx.clearRect(0, 0, w, h);
+  for (let cy = 0; cy < h; cy += 12)
+    for (let cx = 0; cx < w; cx += 12)
+      mainCtx.fillStyle = ((cx/12 + cy/12) % 2 === 0) ? '#ccc' : '#999';
+  for (let cy = 0; cy < h; cy += 12)
+    for (let cx = 0; cx < w; cx += 12) {
+      mainCtx.fillStyle = ((cx/12 + cy/12) % 2 === 0) ? '#cccccc' : '#999999';
+      mainCtx.fillRect(cx, cy, 12, 12);
+    }
+  mainCtx.drawImage(img, 0, 0, w, h);
+
+  drawOverlay();
+}
+
+function drawOverlay() {
+  if (!img) return;
+  const fw = getFW() * zoom;
+  const fh = getFH() * zoom;
+  const w = overlayCanvas.width;
+  const h = overlayCanvas.height;
+
+  overlayCtx.clearRect(0, 0, w, h);
+
+  // 격자
+  overlayCtx.strokeStyle = 'rgba(255, 255, 100, 0.3)';
+  overlayCtx.lineWidth = 0.5;
+  for (let x = 0; x <= w; x += fw) {
+    overlayCtx.beginPath(); overlayCtx.moveTo(x, 0); overlayCtx.lineTo(x, h); overlayCtx.stroke();
+  }
+  for (let y = 0; y <= h; y += fh) {
+    overlayCtx.beginPath(); overlayCtx.moveTo(0, y); overlayCtx.lineTo(w, y); overlayCtx.stroke();
+  }
+
+  // 기록된 프레임들
+  frames.forEach((f, i) => {
+    overlayCtx.fillStyle = 'rgba(0, 200, 100, 0.25)';
+    overlayCtx.fillRect(f.x * zoom, f.y * zoom, fw, fh);
+    overlayCtx.strokeStyle = '#00cc66';
+    overlayCtx.lineWidth = 2;
+    overlayCtx.strokeRect(f.x * zoom, f.y * zoom, fw, fh);
+    overlayCtx.fillStyle = '#00cc66';
+    overlayCtx.font = `bold ${Math.max(10, fw * 0.2)}px monospace`;
+    overlayCtx.fillText(i + 1, f.x * zoom + 3, f.y * zoom + fw * 0.25);
+  });
+
+  // 현재 마우스 위치 하이라이트
+  const snapX = Math.floor(mouseX / (getFW() * zoom)) * getFW() * zoom;
+  const snapY = Math.floor(mouseY / (getFH() * zoom)) * getFH() * zoom;
+  overlayCtx.fillStyle = 'rgba(255, 200, 50, 0.2)';
+  overlayCtx.fillRect(snapX, snapY, fw, fh);
+  overlayCtx.strokeStyle = '#FFD700';
+  overlayCtx.lineWidth = 2;
+  overlayCtx.strokeRect(snapX, snapY, fw, fh);
+
+  // 십자선
+  overlayCtx.strokeStyle = 'rgba(255,100,100,0.7)';
+  overlayCtx.lineWidth = 1;
+  overlayCtx.beginPath();
+  overlayCtx.moveTo(mouseX, 0); overlayCtx.lineTo(mouseX, h);
+  overlayCtx.moveTo(0, mouseY); overlayCtx.lineTo(w, mouseY);
+  overlayCtx.stroke();
+}
+
+// ── 마우스 이벤트 ──
+overlayCanvas.addEventListener('mousemove', (e) => {
+  const rect = overlayCanvas.getBoundingClientRect();
+  mouseX = e.clientX - rect.left;
+  mouseY = e.clientY - rect.top;
+  const z = getZoom();
+  const origX = Math.round(mouseX / z);
+  const origY = Math.round(mouseY / z);
+  const fw = getFW();
+  const fh = getFH();
+
+  document.getElementById('mx').textContent = origX;
+  document.getElementById('my').textContent = origY;
+  document.getElementById('bgx').textContent = -origX;
+  document.getElementById('bgy').textContent = -origY;
+  document.getElementById('gridPos').textContent =
+    `열 ${Math.floor(origX / fw)}, 행 ${Math.floor(origY / fh)}`;
+
+  // 줌 미리보기
+  if (img) {
+    zoomCtx.clearRect(0, 0, 128, 128);
+    zoomCtx.imageSmoothingEnabled = false;
+    zoomCtx.drawImage(img, origX - fw/2, origY - fh/2, fw, fh, 0, 0, 128, 128);
+    document.getElementById('zoomPrev').classList.add('active');
+  }
+
+  drawOverlay();
+});
+
+overlayCanvas.addEventListener('mouseleave', () => {
+  document.getElementById('zoomPrev').classList.remove('active');
+});
+
+overlayCanvas.addEventListener('click', (e) => {
+  const rect = overlayCanvas.getBoundingClientRect();
+  const z = getZoom();
+  const origX = Math.round((e.clientX - rect.left) / z);
+  const origY = Math.round((e.clientY - rect.top)  / z);
+  const fw = getFW();
+  const fh = getFH();
+
+  // 격자에 스냅
+  const snapX = Math.floor(origX / fw) * fw;
+  const snapY = Math.floor(origY / fh) * fh;
+
+  const label = prompt(`프레임 ${frames.length + 1} 이름을 입력하세요\n(예: walkLeft_0, walkRight_1, inhaling_0)`, `frame_${frames.length}`);
+  if (label === null) return;
+
+  frames.push({ label, x: snapX, y: snapY });
+  updateFrameList();
+  drawOverlay();
+});
+
+// ── 입력값 변경 시 다시 그리기 ──
+['fw','fh','zoom'].forEach(id => {
+  document.getElementById(id).addEventListener('change', redraw);
+});
+
+function updateFrameList() {
+  const list = document.getElementById('frameList');
+  document.getElementById('frameCount').textContent = frames.length;
+  list.innerHTML = frames.map((f, i) => `
+    <div class="frame-entry">
+      <span class="tag">${i + 1}</span>
+      <b style="color:#FFD700">${f.label}</b>
+      <span class="coords">x:${f.x}, y:${f.y} → bg-pos: ${-f.x}px ${-f.y}px</span>
+      <button class="remove" onclick="removeFrame(${i})">✕</button>
+    </div>
+  `).join('');
+
+  // 코드 생성
+  const fw = getFW();
+  const fh = getFH();
+  const groups = {};
+  frames.forEach(f => {
+    const [grp, idx] = f.label.includes('_') ? f.label.split('_') : [f.label, '0'];
+    if (!groups[grp]) groups[grp] = [];
+    groups[grp].push({ x: f.x, y: f.y });
+  });
+
+  let code = `// 이미지 크기: ${img ? img.naturalWidth : '?'} × ${img ? img.naturalHeight : '?'} px\n`;
+  code += `// 프레임 크기: ${fw} × ${fh} px\n\n`;
+  code += `const FRAMES = {\n`;
+  Object.entries(groups).forEach(([grp, pts]) => {
+    code += `  ${grp}: [\n`;
+    pts.forEach(p => {
+      code += `    { x: ${p.x}, y: ${p.y} },\n`;
+    });
+    code += `  ],\n`;
+  });
+  code += `};\n\n`;
+  code += `// CSS background-position 예시:\n`;
+  Object.entries(groups).forEach(([grp, pts]) => {
+    code += `// ${grp}: y = -${pts[0]?.y ?? 0}px\n`;
+    pts.forEach((p, i) => {
+      code += `//   frame ${i}: background-position: ${-p.x}px ${-p.y}px\n`;
+    });
+  });
+
+  document.getElementById('codeOutput').textContent = code;
+}
+
+function removeFrame(i) {
+  frames.splice(i, 1);
+  updateFrameList();
+  drawOverlay();
+}
+
+function clearFrames() {
+  frames = [];
+  updateFrameList();
+  drawOverlay();
+}
+
+function copyOutput() {
+  const text = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(text).then(() => alert('✅ 코드가 클립보드에 복사됐어요!'));
+}
+</script>
+</body>
+</html>

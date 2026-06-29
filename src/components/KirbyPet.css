@@ -1,0 +1,192 @@
+/* =====================================================
+   🐾 KirbyPet.css
+   ===================================================== */
+
+/* ── 커비 래퍼 ── */
+.kirby-pet-wrapper {
+  position: fixed;
+  z-index: 9999;
+  cursor: pointer;
+  user-select: none;
+  pointer-events: auto;
+  will-change: left, top;
+}
+
+.kirby-pet-wrapper--hovered {
+  animation: kirbyBounce 0.25s ease-in-out infinite alternate;
+}
+
+@keyframes kirbyBounce {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.1); }
+}
+
+/* ── 커비 스프라이트 div ── */
+.kirby-sprite {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  filter: drop-shadow(0 4px 8px rgba(255, 100, 150, 0.5));
+}
+
+.kirby-sprite--inhaling {
+  animation: inhalePulse 0.2s ease-in-out infinite alternate;
+  filter:
+    drop-shadow(0 0 14px rgba(255, 210, 50, 0.95))
+    drop-shadow(0 0 28px rgba(255, 80, 255, 0.6))
+    brightness(1.2);
+}
+
+@keyframes inhalePulse {
+  from { transform: scale(1.0); }
+  to   { transform: scale(1.15); }
+}
+
+/* ── 픽셀 말풍선 ── */
+.kirby-speech-bubble {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff;
+  border: 3px solid #3D2B1F;
+  border-radius: 0;
+  padding: 7px 12px;
+  min-width: 130px;
+  max-width: 200px;
+  text-align: center;
+  white-space: normal;
+  box-shadow: 3px 3px 0px #3D2B1F;
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.kirby-speech-bubble--visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.kirby-speech-bubble--hidden {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-6px) scale(0.88);
+}
+
+.kirby-speech-text {
+  font-family: 'Noto Sans KR', 'Dotum', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #3D2B1F;
+  line-height: 1.5;
+}
+
+/* 말풍선 꼬리 */
+.kirby-speech-tail {
+  position: absolute;
+  bottom: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-top: 12px solid #3D2B1F;
+}
+
+.kirby-speech-tail::after {
+  content: '';
+  position: absolute;
+  top: -14px;
+  left: -6px;
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top: 10px solid #fff;
+}
+
+/* ── 무지개 잔상 레이어 ── */
+.kirby-trail-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  overflow: hidden;
+}
+
+.kirby-trail-dot {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(1.5px);
+}
+
+/* ── 흡입 파티클 ── */
+.kirby-inhale-zone {
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+}
+
+.kirby-inhale-particle {
+  position: absolute;
+  border-radius: 50%;
+  left: var(--px);
+  top: var(--py);
+  transform: translate(-50%, -50%);
+  animation: inhaleMove 0.55s ease-in forwards;
+  filter: blur(2px);
+}
+
+@keyframes inhaleMove {
+  0%   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; left: 0; top: 0; transform: translate(-50%, -50%) scale(0.1); }
+}
+
+.kirby-inhale-ripple {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 210, 50, 0.65);
+  animation: inhaleRipple 0.75s ease-out infinite;
+  pointer-events: none;
+}
+
+.kirby-inhale-ripple--delay {
+  animation-delay: 0.37s;
+  border-color: rgba(255, 90, 255, 0.5);
+}
+
+@keyframes inhaleRipple {
+  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
+}
+
+/* ── 별 이펙트 ── */
+.kirby-stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.kirby-star {
+  position: absolute;
+  font-size: 14px;
+  top: 50%;
+  left: 50%;
+  animation: starOrbit 1s linear infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes starOrbit {
+  0%   { transform: rotate(var(--angle)) translateX(52px) scale(0.4); opacity: 0; }
+  25%  { opacity: 1; }
+  75%  { opacity: 1; }
+  100% { transform: rotate(calc(var(--angle) + 360deg)) translateX(52px) scale(0.4); opacity: 0; }
+}
