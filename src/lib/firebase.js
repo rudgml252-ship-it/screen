@@ -12,12 +12,12 @@ import { getFirestore } from 'firebase/firestore';
 // 5. Firebase SDK 구성 → "구성" 선택 → 아래 값들을 복사해서 붙여넣기
 // ──────────────────────────────────────────────────────────────────
 const firebaseConfig = {
-  apiKey:            'YOUR_API_KEY',
-  authDomain:        'YOUR_AUTH_DOMAIN',
-  projectId:         'YOUR_PROJECT_ID',
-  storageBucket:     'YOUR_STORAGE_BUCKET',
-  messagingSenderId: 'YOUR_MESSAGING_SENDER_ID',
-  appId:             'YOUR_APP_ID',
+  apiKey:            'AIzaSyAUnKRFdPxgBj_M1K-P9AVHI1Ks9-sMpmI',
+  authDomain:        'screen-9a943.firebaseapp.com',
+  projectId:         'screen-9a943',
+  storageBucket:     'screen-9a943.firebasestorage.app',
+  messagingSenderId: '213149901125',
+  appId:             '1:213149901125:web:ed966c0a99f64927f09e2c',
 };
 
 const isConfigured = !firebaseConfig.apiKey.startsWith('YOUR_');
