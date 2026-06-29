@@ -1,16 +1,68 @@
-# React + Vite
+# 📋 모두의 학급 — 사용 안내
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 인왕중학교 안경희 선생님 · 학급 전자칠판 운영 가이드  
+> 최종 수정일: 2026년 6월 29일
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## ① 목적
 
-## React Compiler
+- 학급 공지·일정·칭찬 도장 등을 **실시간**으로 학생과 공유
+- TV·프로젝터 등 디스플레이에 연결해 **전자칠판**으로 활용 (기존 분필 칠판의 디지털 전환)
+- 공지·타이머·랜덤 발표자·학급 선거 등 학급 운영 기능을 **한 곳에 통합**
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+---
 
-## Expanding the ESLint configuration
+## ② 사용 방법
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### STEP 1 · 학급 코드 입력 및 학급 생성
+
+- 사이트 접속 후 **학급 코드** 입력 (예: 인왕-2-1)
+- 처음 사용하는 코드면 **새 학급이 자동으로 생성**됩니다
+- 같은 코드를 입력하면 언제 어디서든 같은 학급 데이터에 접속 가능
+- 🎲 버튼으로 코드를 자동 생성할 수도 있습니다
+
+### STEP 2 · 교사 패널 접속 및 비밀번호 설정
+
+- 메인 화면 → **교사 패널** 클릭 (최초 접속 시 비밀번호 없이 입장)
+- 교사 패널 하단 **🔐 교사 모드 비밀번호**에서 비밀번호 설정
+- 설정 후 전자칠판 우하단 자물쇠 클릭 → 비밀번호 입력 → 교사 패널 이동
+- ⚠ 비밀번호는 이 기기 브라우저에만 저장 — 다른 기기에서는 별도 설정 필요
+
+### STEP 3 · 전자칠판 실행 및 실시간 운영
+
+- 메인 화면 → **전자칠판 보기** 클릭 → TV·프로젝터에 출력
+- **F11** 키로 전체화면 전환 권장 (Chrome 브라우저 최적화)
+- 교무실 PC에서 교사 패널로 수정하면 교실 전자칠판에 **즉시 반영**
+
+---
+
+## ③ 주요 기능
+
+| 기능 | 설명 |
+|------|------|
+| 📢 공지사항 | 긴급·일반·제출·시간표 유형별 작성, 만료일 설정 가능 |
+| 📅 D-Day 카운트다운 | 시험·행사·방학 등 날짜 등록 시 남은 일수 자동 표시 |
+| 🐥 칭찬 도장 | 학생별 도장 부여, 주간·누적 현황 및 TOP3 표시 |
+| ⏱️ 집중 타이머 | 학습 집중 타이머를 전자칠판에 크게 표시 |
+| 🎲 랜덤 발표자 | 학생 명단에서 무작위로 발표자를 선정하여 표시 |
+| 🗳️ 학급 선거 | 투표 항목 생성 후 학생 실시간 투표 및 결과 집계 |
+| 🧹 청소 당번 | 청소 구역별 담당 학생 배정 및 관리 |
+| 📸 학급 사진 | 사진 업로드 시 전자칠판에서 슬라이드쇼로 표시 |
+| 📖 오늘의 교육 | 교육자료 카드를 전자칠판에 순환 표시 |
+
+---
+
+## ④ 주의사항
+
+- 🔐 **비밀번호**는 이 기기의 브라우저에만 저장됩니다. 다른 기기에서 교사 패널 접속 시 별도로 설정해야 합니다.
+- ⚠ **학급 사진**은 서버에 업로드되지 않고 이 기기에만 저장됩니다. 기기가 바뀌면 재업로드가 필요합니다.
+- 💡 **공지사항·학생 정보·칭찬 도장**은 Firebase를 통해 여러 기기 간 실시간 자동 동기화됩니다.
+- ⚠ **학급 코드**를 아는 사람은 누구나 전자칠판을 볼 수 있습니다. 코드는 학급 내에서만 공유하세요.
+- ⚠ **공용 PC** 사용 시 수업 종료 후 브라우저 방문 기록 삭제(설정 → 방문 기록 삭제)를 권장합니다.
+- 💡 학생 이름은 전자칠판 화면에 가운데 글자가 **✦**로 마스킹 처리되어 표시됩니다.
+- 💡 **Chrome 브라우저 + 전체화면(F11)** 환경에서 가장 안정적으로 작동합니다.
+
+---
+
+*모두의 학급 · 인왕중학교 안경희 선생님*
