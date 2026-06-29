@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>모두의 학급 — 사용 안내</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap');
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+      font-size: 13px;
+      color: #1E1020;
+      background: #fff;
+      padding: 30px 40px;
+      max-width: 780px;
+      margin: 0 auto;
+    }
+
+    /* ── 상단 헤더 ── */
+    .doc-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 3px solid #D94F72;
+      padding-bottom: 12px;
+      margin-bottom: 20px;
+    }
+    .doc-title {
+      font-size: 22px;
+      font-weight: 900;
+      color: #D94F72;
+      letter-spacing: -0.5px;
+    }
+    .doc-sub {
+      font-size: 11px;
+      color: #999;
+      margin-top: 3px;
+    }
+    .doc-badge {
+      background: #FFF0F4;
+      border: 1.5px solid #FFCCD6;
+      border-radius: 8px;
+      padding: 6px 14px;
+      font-size: 11px;
+      color: #D94F72;
+      font-weight: 700;
+      text-align: right;
+    }
+
+    /* ── 섹션 ── */
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 900;
+      color: #fff;
+      background: #D94F72;
+      padding: 5px 14px;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      display: inline-block;
+    }
+
+    /* ── 목적 박스 ── */
+    .purpose-box {
+      background: #FFF5F7;
+      border: 1.5px solid #FFCCD6;
+      border-left: 4px solid #D94F72;
+      border-radius: 8px;
+      padding: 12px 16px;
+      line-height: 1.8;
+    }
+    .purpose-box p { margin-bottom: 4px; }
+    .purpose-box p:last-child { margin-bottom: 0; }
+
+    /* ── 단계 박스 ── */
+    .step {
+      margin-bottom: 14px;
+    }
+    .step-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #D94F72;
+      background: #FFF0F4;
+      border: 1px solid #FFCCD6;
+      border-radius: 5px;
+      padding: 3px 10px;
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+    .step-content {
+      padding-left: 12px;
+      line-height: 1.85;
+      color: #2E1A28;
+    }
+    .step-content li {
+      list-style: none;
+      padding-left: 14px;
+      position: relative;
+      margin-bottom: 2px;
+    }
+    .step-content li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: #D94F72;
+    }
+
+    /* ── 기능 그리드 ── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .feature-item {
+      background: #FFF5F7;
+      border: 1.5px solid #FFCCD6;
+      border-radius: 8px;
+      padding: 8px 12px;
+    }
+    .feature-name {
+      font-size: 12px;
+      font-weight: 700;
+      color: #D94F72;
+      margin-bottom: 3px;
+    }
+    .feature-desc {
+      font-size: 11px;
+      color: #5A3A4A;
+      line-height: 1.5;
+    }
+
+    /* ── 주의사항 ── */
+    .caution-list {
+      padding-left: 0;
+    }
+    .caution-list li {
+      list-style: none;
+      padding: 7px 12px 7px 34px;
+      margin-bottom: 5px;
+      border-radius: 7px;
+      font-size: 12px;
+      line-height: 1.6;
+      position: relative;
+    }
+    .caution-list li::before {
+      position: absolute;
+      left: 10px;
+      font-size: 14px;
+    }
+    .caution-orange { background: #FFF6E6; border: 1.5px solid #FFDDAA; }
+    .caution-orange::before { content: '⚠️'; }
+    .caution-blue { background: #EFF5FF; border: 1.5px solid #BCD4FF; }
+    .caution-blue::before { content: '💡'; }
+    .caution-red { background: #FFF0F2; border: 1.5px solid #FFBBCC; }
+    .caution-red::before { content: '🔐'; }
+
+    /* ── 하단 ── */
+    .doc-footer {
+      margin-top: 24px;
+      padding-top: 10px;
+      border-top: 1px solid #FFCCD6;
+      font-size: 10px;
+      color: #bbb;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    /* ── 인쇄 버튼 (화면에서만 표시) ── */
+    .print-btn {
+      display: block;
+      margin: 0 auto 24px;
+      padding: 10px 28px;
+      background: #D94F72;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+    }
+    .print-btn:hover { background: #B5274A; }
+
+    @media print {
+      .print-btn { display: none; }
+      body { padding: 15px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <button class="print-btn" onclick="window.print()">🖨️ 인쇄 / PDF 저장</button>
+
+  <!-- 헤더 -->
+  <div class="doc-header">
+    <div>
+      <div class="doc-title">📋 모두의 학급 — 사용 안내</div>
+      <div class="doc-sub">인왕중학교 안경희 선생님 · 학급 전자칠판 운영 가이드</div>
+    </div>
+    <div class="doc-badge">
+      작성일: 2026년 6월 29일<br/>
+      대상: 담임 교사
+    </div>
+  </div>
+
+  <!-- 1. 목적 -->
+  <div class="section">
+    <div class="section-title">① 목적</div>
+    <div class="purpose-box">
+      <p>▸ 공지사항·일정·칭찬 도장 등 학급 운영 정보를 <strong>실시간</strong>으로 학생과 공유</p>
+      <p>▸ 기존 분필 칠판과 달리, <strong>TV·프로젝터 등 디스플레이</strong>에 연결하여 전자칠판 기능을 최대한 활용</p>
+      <p>▸ 공지·타이머·발표자·선거 등 학급 운영에 필요한 기능을 <strong>한 곳에 통합</strong>하여 편의성 향상</p>
+    </div>
+  </div>
+
+  <!-- 2. 사용 방법 -->
+  <div class="section">
+    <div class="section-title">② 사용 방법</div>
+
+    <div class="step">
+      <div class="step-label">STEP 1 · 초기 접속 및 비밀번호 설정</div>
+      <ul class="step-content">
+        <li>브라우저에서 서비스 주소 접속 → <strong>모두의 학급</strong> 메인 화면 확인</li>
+        <li><strong>교사 패널</strong> 버튼 클릭 (최초 접속 시 비밀번호 없이 입장)</li>
+        <li>교사 패널 하단 <strong>🔐 교사 모드 비밀번호</strong> 항목에서 비밀번호 설정</li>
+        <li>설정 후 전자칠판 화면의 우하단 자물쇠 아이콘 클릭 시 비밀번호 확인</li>
+        <li>⚠ 비밀번호는 <u>이 기기의 브라우저에만</u> 저장됩니다 (다른 기기에서는 재설정 필요)</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <div class="step-label">STEP 2 · 전자칠판 표시</div>
+      <ul class="step-content">
+        <li>메인 화면 → <strong>전자칠판 보기</strong> 클릭</li>
+        <li>TV·프로젝터 연결 후 <strong>F11</strong> 키로 전체화면 전환 권장</li>
+        <li>공지사항·D-Day·TOP3 도장·교육자료·학급 사진이 자동 표시됨</li>
+      </ul>
+    </div>
+
+    <div class="step">
+      <div class="step-label">STEP 3 · 교사 패널에서 내용 관리</div>
+      <ul class="step-content">
+        <li>전자칠판 우하단 자물쇠 클릭 → 비밀번호 입력 → 교사 패널 이동</li>
+        <li>또는 메인 화면 → <strong>교사 패널</strong> 버튼으로 직접 접속</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 3. 주요 기능 -->
+  <div class="section">
+    <div class="section-title">③ 주요 기능</div>
+    <div class="feature-grid">
+      <div class="feature-item">
+        <div class="feature-name">📢 공지사항</div>
+        <div class="feature-desc">긴급·일반·제출·시간표 유형별 공지 작성. 만료일 설정 가능.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">📅 D-Day 카운트다운</div>
+        <div class="feature-desc">시험·행사·방학 등 날짜 등록 시 자동으로 남은 일수 표시.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">🐥 칭찬 도장</div>
+        <div class="feature-desc">학생별 도장 부여, 주간·누적 현황 집계, 상위 3명 자동 표시.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">⏱️ 집중 타이머</div>
+        <div class="feature-desc">수업 중 전자칠판에 큰 화면으로 타이머 표시.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">🎲 랜덤 발표자</div>
+        <div class="feature-desc">학생 명단에서 무작위로 발표자를 선정하여 화면에 표시.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">🗳️ 학급 선거</div>
+        <div class="feature-desc">투표 항목 생성 후 학생들이 직접 투표, 실시간 결과 집계.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">🧹 청소 당번</div>
+        <div class="feature-desc">청소 구역별 담당 학생 배정 및 관리.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">📸 학급 사진</div>
+        <div class="feature-desc">사진 업로드 시 전자칠판에서 슬라이드쇼로 자동 표시.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">📖 오늘의 교육</div>
+        <div class="feature-desc">교육자료 카드 작성 후 전자칠판에 순환 표시.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. 주의사항 -->
+  <div class="section">
+    <div class="section-title">④ 주의사항</div>
+    <ul class="caution-list">
+      <li class="caution-red">비밀번호는 이 기기의 브라우저에만 저장됩니다. 다른 기기에서 교사 패널 접속 시 새로 설정해야 합니다.</li>
+      <li class="caution-orange">학급 사진은 서버에 업로드되지 않고 이 기기에만 저장됩니다. 기기가 바뀌면 재업로드가 필요합니다.</li>
+      <li class="caution-blue">공지사항·학생 정보·도장 현황은 Firebase를 통해 여러 기기 간 자동으로 동기화됩니다.</li>
+      <li class="caution-orange">공용 PC 사용 시 수업 종료 후 브라우저 로컬 데이터 삭제(설정 → 방문 기록 삭제)를 권장합니다.</li>
+      <li class="caution-blue">Chrome 브라우저 + 전체화면(F11) 환경에서 가장 안정적으로 작동합니다.</li>
+      <li class="caution-orange">학생 이름은 화면 표시 시 앞·뒤 글자만 표시되고 가운데는 ✦로 마스킹 처리됩니다.</li>
+    </ul>
+  </div>
+
+  <!-- 하단 -->
+  <div class="doc-footer">
+    <span>모두의 학급 · 인왕중학교 안경희 선생님</span>
+    <span>문의: 담임 교사 직접 확인</span>
+  </div>
+
+</body>
+</html>
