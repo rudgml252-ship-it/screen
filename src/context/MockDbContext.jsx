@@ -1,7 +1,55 @@
-import { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
+import { doc, setDoc, onSnapshot } from 'firebase/firestore';
+import { firestoreDb, FIREBASE_ENABLED } from '../lib/firebase';
 
 const MockDbContext = createContext(null);
 const gid = (prefix) => `${prefix}_${Date.now()}_${Math.floor(Math.random() * 9999)}`;
+
+// ── Firestore 동기화 대상 필드 (너무 큰 정적 데이터 제외) ──
+const LOCAL_ONLY_FIELDS = new Set(['quotes', 'educationCards', 'photos']);
+const FIRESTORE_DOC = 'class-1';
+
+function extractSyncable(db) {
+  const out = {};
+  for (const key of Object.keys(db)) {
+    if (LOCAL_ONLY_FIELDS.has(key)) continue;
+    if (key === 'students') {
+      // 도장 히스토리 제외 (Firestore 1MB 문서 크기 제한)
+      out.students = db.students.map(s => ({
+        id: s.id, name: s.name, number: s.number,
+        presentedCount: s.presentedCount ?? 0,
+        stamps: { total: s.stamps.total, weekly: s.stamps.weekly },
+      }));
+    } else {
+      out[key] = db[key];
+    }
+  }
+  return out;
+}
+
+function mergeFbData(local, fb) {
+  const merged = { ...local };
+  for (const key of Object.keys(fb)) {
+    if (LOCAL_ONLY_FIELDS.has(key)) continue;
+    if (key === 'students') {
+      const localMap = new Map(local.students.map(s => [s.id, s]));
+      merged.students = (fb.students || []).map(fbS => {
+        const loc = localMap.get(fbS.id);
+        if (!loc) return { ...fbS, stamps: { ...fbS.stamps, history: {} } };
+        return {
+          ...loc,
+          name: fbS.name,
+          number: fbS.number,
+          presentedCount: fbS.presentedCount ?? loc.presentedCount,
+          stamps: { ...loc.stamps, total: fbS.stamps.total, weekly: fbS.stamps.weekly },
+        };
+      });
+    } else {
+      merged[key] = fb[key];
+    }
+  }
+  return merged;
+}
 
 const defaultData = {
   classInfo: { name: '3학년 2반', school: '행복초등학교', teacherName: '김선생님', year: 2026, semester: 1, teacherPassword: '' },
@@ -268,6 +316,9 @@ const defaultData = {
 };
 
 export const MockDbProvider = ({ children }) => {
+  const fromFirestoreRef  = useRef(false);
+  const fbSyncTimerRef    = useRef(null);
+
   const [db, setDb] = useState(() => {
     try {
       const saved = localStorage.getItem('classboard_v2');
@@ -325,6 +376,37 @@ export const MockDbProvider = ({ children }) => {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
+  }, [db]);
+
+  // ── Firebase: 실시간 수신 ──
+  useEffect(() => {
+    if (!FIREBASE_ENABLED) return;
+    const ref = doc(firestoreDb, 'classes', FIRESTORE_DOC);
+    const unsub = onSnapshot(ref, (snap) => {
+      if (!snap.exists()) return;
+      fromFirestoreRef.current = true;
+      setDb(prev => mergeFbData(prev, snap.data()));
+    }, (err) => {
+      console.warn('[Firebase] onSnapshot 오류:', err.message);
+    });
+    return unsub;
+  }, []);
+
+  // ── Firebase: 변경 시 동기화 (로컬 변경만, 수신된 변경 제외) ──
+  useEffect(() => {
+    if (!FIREBASE_ENABLED) return;
+    if (fromFirestoreRef.current) {
+      fromFirestoreRef.current = false;
+      return;
+    }
+    clearTimeout(fbSyncTimerRef.current);
+    fbSyncTimerRef.current = setTimeout(() => {
+      const ref = doc(firestoreDb, 'classes', FIRESTORE_DOC);
+      setDoc(ref, extractSyncable(db), { merge: true }).catch(
+        err => console.warn('[Firebase] 쓰기 오류:', err.message)
+      );
+    }, 800);
+    return () => clearTimeout(fbSyncTimerRef.current);
   }, [db]);
 
   const addAnnouncement = useCallback((ann) => setDb(prev => ({
