@@ -104,11 +104,12 @@ export default function BoardPage() {
     const cursor = document.createElement('div');
     cursor.style.cssText = `
       position:fixed; pointer-events:none; z-index:99999;
-      width:13px; height:13px;
-      background: radial-gradient(circle at 35% 35%, #FF8FAD, #E84570);
-      border-radius:50%;
-      transform:translate(-50%,-50%);
-      box-shadow: 0 0 8px rgba(232,69,112,0.9), 0 0 18px rgba(255,86,115,0.4);
+      width:40px; height:40px;
+      background-image: url('/wand-cursor.svg');
+      background-size: contain;
+      background-repeat: no-repeat;
+      transform:translate(-5px,-5px);
+      filter: drop-shadow(0 2px 4px rgba(232,69,112,0.5));
     `;
     document.body.appendChild(cursor);
 

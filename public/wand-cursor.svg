@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="40" height="40">
+  <!-- 요술봉 막대 (대각선) -->
+  <line x1="13" y1="13" x2="37" y2="37" stroke="#3A1A0A" stroke-width="5" stroke-linecap="round"/>
+  <line x1="13" y1="13" x2="37" y2="37" stroke="#C07838" stroke-width="2.5" stroke-linecap="round"/>
+  <!-- 막대 끝 손잡이 -->
+  <circle cx="37" cy="37" r="3.5" fill="#3A1A0A"/>
+  <circle cx="37" cy="37" r="2"   fill="#E8A040"/>
+
+  <!-- 별 (팁) -->
+  <polygon points="8,0 9.8,5.8 16,5.8 11,9.4 12.9,15.2 8,11.5 3.1,15.2 5,9.4 0,5.8 6.2,5.8"
+           fill="#FFE040" stroke="#E89000" stroke-width="0.8"/>
+  <!-- 별 광택 -->
+  <polygon points="8,2 9,5.2 12,5.2 9.8,7 10.6,10 8,8.5 5.4,10 6.2,7 4,5.2 7,5.2"
+           fill="#FFF8A0" opacity="0.55"/>
+
+  <!-- 반짝임 -->
+  <circle cx="22" cy="5"  r="2.2" fill="#FFE040" opacity="0.85"/>
+  <circle cx="28" cy="3"  r="1.4" fill="#FF9AB5" opacity="0.8"/>
+  <circle cx="5"  cy="22" r="1.4" fill="#A0CFFF" opacity="0.75"/>
+  <circle cx="32" cy="10" r="1"   fill="#FFE040" opacity="0.65"/>
+  <circle cx="17" cy="3"  r="1"   fill="#FF9AB5" opacity="0.6"/>
+</svg>
