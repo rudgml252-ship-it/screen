@@ -979,7 +979,7 @@ export default function TeacherPage() {
         <div className={styles.hLeft}>
           <span className={styles.logo}>🐣</span>
           <div>
-            <h1 className={styles.hTitle}>ClassBoard 교사 패널</h1>
+            <h1 className={styles.hTitle}>모두의 학급 교사 패널</h1>
             <p className={styles.hSub}>{db.classInfo?.name} · {db.classInfo?.school}</p>
           </div>
         </div>

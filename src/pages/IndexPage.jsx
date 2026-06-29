@@ -15,7 +15,7 @@ export default function IndexPage() {
           <span className={styles.e2}>📚</span>
           <span className={styles.e3}>⭐</span>
         </div>
-        <h1 className={styles.title}>ClassBoard</h1>
+        <h1 className={styles.title}>모두의 학급</h1>
         <p className={styles.subtitle}>🏫 우리 반 실시간 학급 운영 시스템</p>
 
         <div className={styles.featureList}>
