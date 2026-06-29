@@ -35,7 +35,7 @@ function PrivacyModal({ onClose }) {
           <p>학생 및 보호자는 언제든지 개인정보 열람, 정정, 삭제를 요청할 수 있으며, 담당 교사에게 문의하시기 바랍니다.</p>
 
           <h3>6. 문의</h3>
-          <p>개인정보 관련 문의: 인왕중학교 안경희 선생님</p>
+          <p>개인정보 관련 문의는 담당 교사에게 직접 문의하시기 바랍니다.</p>
         </div>
       </div>
     </div>
@@ -52,12 +52,12 @@ function TermsModal({ onClose }) {
           <p className={styles.updated}>최종 수정일: 2026년 6월 29일</p>
 
           <h3>제1조 (목적)</h3>
-          <p>본 약관은 인왕중학교 학급 전자칠판 서비스(이하 "서비스")의 이용 조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>
+          <p>본 약관은 모두의 학급 서비스(이하 "서비스")의 이용 조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>
 
           <h3>제2조 (서비스 내용)</h3>
           <ul>
             <li>학급 공지 및 전달사항 표시</li>
-            <li>D-Day 카운트다운</li>
+            <li>D-day 카운트다운</li>
             <li>칭찬 도장 현황 표시</li>
             <li>학급 사진 슬라이드</li>
             <li>오늘의 교육 자료 제공</li>
@@ -77,7 +77,7 @@ function TermsModal({ onClose }) {
           <p>약관이 변경될 경우 서비스 내 공지를 통해 안내합니다. 변경된 약관은 공지 후 7일이 지난 시점부터 효력이 발생합니다.</p>
 
           <h3>제6조 (문의)</h3>
-          <p>서비스 관련 문의: 인왕중학교 안경희 선생님</p>
+          <p>서비스 관련 문의는 담당 교사에게 직접 문의하시기 바랍니다.</p>
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@ export default function Footer() {
   return (
     <>
       <footer className={styles.footer}>
-        <span className={styles.credit}>© 인왕중학교 안경희</span>
+        <span className={styles.credit}>© 모두의 학급</span>
         <span className={styles.sep}>·</span>
         <button className={styles.link} onClick={() => setShowPrivacy(true)}>개인정보처리방침</button>
         <span className={styles.sep}>·</span>

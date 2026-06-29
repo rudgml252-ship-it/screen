@@ -112,6 +112,13 @@
 }
 .purpleBtn:hover { background:linear-gradient(135deg,#A98BEE,#8E6FDE); transform:translateY(-2px); }
 
+.dangerBtn {
+  background:#FFF0F2; color:#C0374F; border:2px solid #FFBBCC;
+  padding:12px 18px; border-radius:14px;
+  font-size:14px; font-weight:700;
+}
+.dangerBtn:hover { background:#FFD6DE; }
+
 .grayBtn {
   background:#F1F5F9; color:#64748B;
   padding:12px 24px; border-radius:14px;

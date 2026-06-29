@@ -16,6 +16,7 @@ function extractSyncable(db) {
       // 도장 히스토리 제외 (Firestore 1MB 문서 크기 제한)
       out.students = db.students.map(s => ({
         id: s.id, name: s.name, number: s.number,
+        _nameAt: s._nameAt || 0,   // 이름 수정 타임스탬프 (이름 충돌 해결용)
         presentedCount: s.presentedCount ?? 0,
         stamps: { total: s.stamps.total, weekly: s.stamps.weekly },
       }));
@@ -36,17 +37,24 @@ function mergeFbData(local, fb) {
     if (LOCAL_ONLY_FIELDS.has(key)) continue;
     if (key === 'students') {
       const localMap = new Map(local.students.map(s => [s.id, s]));
-      merged.students = (fb.students || []).map(fbS => {
+      const fbIds = new Set((fb.students || []).map(s => s.id));
+      const mergedFromFb = (fb.students || []).map(fbS => {
         const loc = localMap.get(fbS.id);
         if (!loc) return { ...fbS, stamps: { ...fbS.stamps, history: {} } };
+        // 타임스탬프로 이름 충돌 해결: 더 나중에 수정된 쪽 우선
+        const useLocalName = (loc._nameAt || 0) >= (fbS._nameAt || 0);
         return {
           ...loc,
-          name: fbS.name,
+          name: useLocalName ? loc.name : fbS.name,
+          _nameAt: Math.max(loc._nameAt || 0, fbS._nameAt || 0),
           number: fbS.number,
           presentedCount: fbS.presentedCount ?? loc.presentedCount,
           stamps: { ...loc.stamps, total: fbS.stamps.total, weekly: fbS.stamps.weekly },
         };
       });
+      // 아직 Firestore에 없는 로컬 신규 학생 보존
+      const localOnly = local.students.filter(s => !fbIds.has(s.id));
+      merged.students = [...mergedFromFb, ...localOnly];
     } else if (key === 'classInfo') {
       // teacherPassword는 Firestore로 보내지 않으므로 로컬 값을 보존
       merged[key] = { ...fb[key], teacherPassword: local.classInfo?.teacherPassword ?? '' };
@@ -267,29 +275,29 @@ const defaultData = {
   ],
 
   students: [
-    { id: 's01', name: '강민준', number: 1,  stamps: { total: 7,  weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's02', name: '고서연', number: 2,  stamps: { total: 12, weekly: 5, history: {} }, presentedCount: 1 },
-    { id: 's03', name: '권도윤', number: 3,  stamps: { total: 3,  weekly: 2, history: {} }, presentedCount: 3 },
-    { id: 's04', name: '나지우', number: 4,  stamps: { total: 18, weekly: 5, history: {} }, presentedCount: 0 },
-    { id: 's05', name: '노하늘', number: 5,  stamps: { total: 9,  weekly: 1, history: {} }, presentedCount: 2 },
-    { id: 's06', name: '류재원', number: 6,  stamps: { total: 5,  weekly: 3, history: {} }, presentedCount: 1 },
-    { id: 's07', name: '문서아', number: 7,  stamps: { total: 14, weekly: 6, history: {} }, presentedCount: 4 },
-    { id: 's08', name: '박하린', number: 8,  stamps: { total: 2,  weekly: 0, history: {} }, presentedCount: 0 },
-    { id: 's09', name: '배승현', number: 9,  stamps: { total: 20, weekly: 7, history: {} }, presentedCount: 1 },
-    { id: 's10', name: '손다은', number: 10, stamps: { total: 11, weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's11', name: '송민재', number: 11, stamps: { total: 6,  weekly: 2, history: {} }, presentedCount: 1 },
-    { id: 's12', name: '신예린', number: 12, stamps: { total: 15, weekly: 3, history: {} }, presentedCount: 3 },
-    { id: 's13', name: '심도훈', number: 13, stamps: { total: 8,  weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's14', name: '안서윤', number: 14, stamps: { total: 22, weekly: 8, history: {} }, presentedCount: 1 },
-    { id: 's15', name: '양준혁', number: 15, stamps: { total: 4,  weekly: 1, history: {} }, presentedCount: 0 },
-    { id: 's16', name: '오하은', number: 16, stamps: { total: 11, weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's17', name: '유세진', number: 17, stamps: { total: 6,  weekly: 2, history: {} }, presentedCount: 1 },
-    { id: 's18', name: '윤채원', number: 18, stamps: { total: 15, weekly: 3, history: {} }, presentedCount: 3 },
-    { id: 's19', name: '임주원', number: 19, stamps: { total: 8,  weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's20', name: '장태희', number: 20, stamps: { total: 22, weekly: 8, history: {} }, presentedCount: 1 },
-    { id: 's21', name: '정하윤', number: 21, stamps: { total: 4,  weekly: 1, history: {} }, presentedCount: 0 },
-    { id: 's22', name: '조민서', number: 22, stamps: { total: 8,  weekly: 4, history: {} }, presentedCount: 2 },
-    { id: 's23', name: '황예원', number: 23, stamps: { total: 22, weekly: 8, history: {} }, presentedCount: 1 },
+    { id: 's01', name: '강민준', number: 1,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's02', name: '고서연', number: 2,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's03', name: '권도윤', number: 3,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's04', name: '나지우', number: 4,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's05', name: '노하늘', number: 5,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's06', name: '류재원', number: 6,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's07', name: '문서아', number: 7,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's08', name: '박하린', number: 8,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's09', name: '배승현', number: 9,  stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's10', name: '손다은', number: 10, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's11', name: '송민재', number: 11, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's12', name: '신예린', number: 12, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's13', name: '심도훈', number: 13, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's14', name: '안서윤', number: 14, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's15', name: '양준혁', number: 15, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's16', name: '오하은', number: 16, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's17', name: '유세진', number: 17, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's18', name: '윤채원', number: 18, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's19', name: '임주원', number: 19, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's20', name: '장태희', number: 20, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's21', name: '정하윤', number: 21, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's22', name: '조민서', number: 22, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
+    { id: 's23', name: '황예원', number: 23, stamps: { total: 0, weekly: 0, history: {} }, presentedCount: 0 },
   ],
 
   pickerSession: {
@@ -478,7 +486,19 @@ export const MockDbProvider = ({ children, classId = 'class-1' }) => {
     if (!newName.trim()) return;
     setDb(prev => ({
       ...prev,
-      students: prev.students.map(s => s.id === id ? { ...s, name: newName.trim() } : s),
+      students: prev.students.map(s => s.id === id
+        ? { ...s, name: newName.trim(), _nameAt: Date.now() }
+        : s),
+    }));
+  }, []);
+
+  const resetAllStamps = useCallback(() => {
+    setDb(prev => ({
+      ...prev,
+      students: prev.students.map(s => ({
+        ...s,
+        stamps: { total: 0, weekly: 0, history: {} },
+      })),
     }));
   }, []);
 
@@ -587,7 +607,7 @@ export const MockDbProvider = ({ children, classId = 'class-1' }) => {
     <MockDbContext.Provider value={{
       db, setDb, classId,
       addAnnouncement, deleteAnnouncement,
-      addStamp,
+      addStamp, resetAllStamps,
       addStudent, deleteStudent, renameStudent,
       addDday, deleteDday,
       addClassPhoto, deleteClassPhoto, togglePhotoVisibility, updatePhotoCaption,

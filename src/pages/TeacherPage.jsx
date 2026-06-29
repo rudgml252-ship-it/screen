@@ -330,7 +330,7 @@ function AnnounceTab({ db, addAnnouncement, deleteAnnouncement }) {
 }
 
 /* ── 2. 칭찬 스티커 ── */
-function StampsTab({ db, addStamp }) {
+function StampsTab({ db, addStamp, resetAllStamps }) {
   const [reason, setReason] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [toast, setToast] = useState('');
@@ -342,6 +342,14 @@ function StampsTab({ db, addStamp }) {
     if (delta>0 && s) { setToast(`${s.name} +1 🐥`); setTimeout(()=>setToast(''),2000); }
   };
 
+  const handleResetAll = () => {
+    if (window.confirm('모든 학생의 칭찬 스티커를 0으로 초기화할까요?')) {
+      resetAllStamps();
+      setToast('칭찬 스티커 전체 초기화 완료');
+      setTimeout(() => setToast(''), 2500);
+    }
+  };
+
   return (
     <div className={styles.stampsWrap}>
       <div className={styles.stampsHeader}>
@@ -350,6 +358,7 @@ function StampsTab({ db, addStamp }) {
           <input className={styles.input} placeholder="예: 발표를 잘했어요!" value={reason} onChange={e=>setReason(e.target.value)} style={{marginTop:6}} />
         </div>
         <button className={styles.purpleBtn} onClick={()=>setShowModal(true)}>📊 전체 현황</button>
+        <button className={styles.dangerBtn} onClick={handleResetAll}>🔄 전체 초기화</button>
       </div>
 
       <div className={styles.studentGrid}>
@@ -962,7 +971,7 @@ export default function TeacherPage() {
   const { classId } = useParams();
   const navigate = useNavigate();
   const {
-    db, addAnnouncement, deleteAnnouncement, addStamp,
+    db, addAnnouncement, deleteAnnouncement, addStamp, resetAllStamps,
     addStudent, deleteStudent, renameStudent,
     addDday, deleteDday,
     addClassPhoto, deleteClassPhoto, togglePhotoVisibility, updatePhotoCaption,
@@ -1000,7 +1009,7 @@ export default function TeacherPage() {
       <div className={styles.content}>
         {tab==='settings'  && <SettingsTab db={db} updateClassInfo={updateClassInfo}/>}
         {tab==='announce'  && <AnnounceTab db={db} addAnnouncement={addAnnouncement} deleteAnnouncement={deleteAnnouncement}/>}
-        {tab==='stamps'    && <StampsTab db={db} addStamp={addStamp}/>}
+        {tab==='stamps'    && <StampsTab db={db} addStamp={addStamp} resetAllStamps={resetAllStamps}/>}
         {tab==='picker'    && <PickerTab db={db} pickStudent={pickStudent} resetPicker={resetPicker} toggleExcluded={toggleExcluded}/>}
         {tab==='dday'      && <DdayTab db={db} addDday={addDday} deleteDday={deleteDday}/>}
         {tab==='students'  && <StudentsTab db={db} addStudent={addStudent} deleteStudent={deleteStudent} renameStudent={renameStudent}/>}
