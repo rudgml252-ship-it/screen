@@ -17,16 +17,25 @@ const NAGGING_MESSAGES = [
   '🎒 가방 정리 잘 했죠?',
 ];
 
-// 개별 이미지 파일 애니메이션 정의
-const ANIMS = {
-  walkRight: ['/walk right 1.PNG', '/walk right 2.PNG'],
-  walkLeft:  ['/walk left 1.PNG',  '/walk left 2.PNG'],
-  eat:       ['/eat1.PNG', '/eat2.PNG', '/eat3.PNG', '/eat4.PNG', '/eat5.PNG'],
-  fly:       ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'],
+// ── 스프라이트 정의 ──────────────────────────────
+const WALK = {
+  right: ['/walk right 1.PNG', '/walk right 2.PNG'],
+  left:  ['/walk left 1.PNG',  '/walk left 2.PNG'],
 };
+const FLY = ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'];
 
-const FRAME_MS = { walkRight: 160, walkLeft: 160, eat: 110, fly: 130 };
-const SIZE = 96; // 화면 표시 크기(px)
+// eat2/eat3: 입 쫙 벌린 흡입 자세 → 오래 유지해서 "와아아아암" 효과
+const EAT = [
+  { src: '/eat1.PNG', ms:  80 },   // 입 살짝 벌리기
+  { src: '/eat2.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
+  { src: '/eat3.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
+  { src: '/eat4.PNG', ms: 130 },   // 먹히는 중
+  { src: '/eat5.PNG', ms: 130 },   // 삼킨 후
+];
+
+const WALK_MS = 120;
+const FLY_MS  = 130;
+const SIZE    = 96;
 
 const RAINBOW = [
   'rgba(255,80,80,0.7)', 'rgba(255,160,40,0.7)', 'rgba(255,230,40,0.7)',
@@ -34,14 +43,18 @@ const RAINBOW = [
   'rgba(200,80,255,0.7)',
 ];
 
-// 이미지 프리로드 (첫 프레임 깜빡임 방지)
-const ALL_FRAMES = [...new Set(Object.values(ANIMS).flat())];
-ALL_FRAMES.forEach(src => { const img = new Image(); img.src = src; });
+// 전체 이미지 프리로드
+[...WALK.right, ...WALK.left, ...FLY, ...EAT.map(e => e.src)].forEach(src => {
+  const img = new Image(); img.src = src;
+});
 
 export default function KirbyPet() {
   const [pos,        setPos]        = useState({ x: 200, y: 200 });
-  const [animKey,    setAnimKey]    = useState('walkRight');
-  const [frameIdx,   setFrameIdx]   = useState(0);
+  const [walkDir,    setWalkDir]    = useState('right');   // 'right' | 'left'
+  const [moveMode,   setMoveMode]   = useState('walk');    // 'walk' | 'fly'
+  const [walkFrame,  setWalkFrame]  = useState(0);         // 0-1, 방향 바뀌어도 유지
+  const [flyFrame,   setFlyFrame]   = useState(0);         // 0-3
+  const [eatFrame,   setEatFrame]   = useState(0);         // 0-4
   const [isHovered,  setIsHovered]  = useState(false);
   const [message,    setMessage]    = useState(NAGGING_MESSAGES[0]);
   const [msgVisible, setMsgVisible] = useState(true);
@@ -50,23 +63,29 @@ export default function KirbyPet() {
   const posRef       = useRef({ x: 200, y: 200 });
   const dirRef       = useRef({ x: 1, y: 0.4 });
   const isHoveredRef = useRef(false);
-  const animKeyRef   = useRef('walkRight');
-  const frameIdxRef  = useRef(0);
+  const walkDirRef   = useRef('right');
+  const moveModeRef  = useRef('walk');
+  const walkFrameRef = useRef(0);  // ← 절대 방향 전환 시 리셋 안 함
+  const flyFrameRef  = useRef(0);
+  const eatFrameRef  = useRef(0);
   const trailCiRef   = useRef(0);
 
-  // ── 메인 루프 (이동 + 잔상) ──
+  // ── 메인 루프 ──────────────────────────────────
   useEffect(() => {
     const SPEED         = 1.1;
     const TRAIL_MS      = 90;
     const DIR_CHANGE_MS = 3500;
 
-    let lastFrameT = 0;
+    let lastWalkT  = 0;
+    let lastFlyT   = 0;
+    let lastEatT   = 0;
     let lastTrailT = 0;
     let lastDirT   = 0;
     let rafId;
 
     const loop = (ts) => {
       if (!isHoveredRef.current) {
+        /* 이동 */
         const { x, y } = posRef.current;
         const d = dirRef.current;
         let nx = x + d.x * SPEED;
@@ -89,32 +108,38 @@ export default function KirbyPet() {
         posRef.current = { x: nx, y: ny };
         setPos({ x: nx, y: ny });
 
-        // 이동 방향에 따른 애니메이션
+        /* 수직 이동이면 fly, 수평이면 walk (walkFrame 은 절대 리셋 안 함) */
         const absX = Math.abs(dirRef.current.x);
         const absY = Math.abs(dirRef.current.y);
-        let newAnim;
-        if (absX >= absY * 0.6) {
-          newAnim = dirRef.current.x >= 0 ? 'walkRight' : 'walkLeft';
+        const newMode = absY > absX * 1.2 ? 'fly' : 'walk';
+        if (newMode !== moveModeRef.current) {
+          moveModeRef.current = newMode;
+          setMoveMode(newMode);
+        }
+
+        /* 걷기 방향 갱신 (walkFrame 은 그대로 이어감) */
+        if (newMode === 'walk') {
+          const newDir = dirRef.current.x >= 0 ? 'right' : 'left';
+          if (newDir !== walkDirRef.current) {
+            walkDirRef.current = newDir;
+            setWalkDir(newDir);
+          }
+          if (ts - lastWalkT > WALK_MS) {
+            lastWalkT = ts;
+            const next = (walkFrameRef.current + 1) % WALK[walkDirRef.current].length;
+            walkFrameRef.current = next;
+            setWalkFrame(next);
+          }
         } else {
-          newAnim = 'fly';
-        }
-        if (newAnim !== animKeyRef.current) {
-          animKeyRef.current = newAnim;
-          setAnimKey(newAnim);
-          frameIdxRef.current = 0;
-          setFrameIdx(0);
-        }
-
-        // 프레임 전진
-        const fms = FRAME_MS[animKeyRef.current] ?? 160;
-        if (ts - lastFrameT > fms) {
-          lastFrameT = ts;
-          const next = (frameIdxRef.current + 1) % ANIMS[animKeyRef.current].length;
-          frameIdxRef.current = next;
-          setFrameIdx(next);
+          if (ts - lastFlyT > FLY_MS) {
+            lastFlyT = ts;
+            const next = (flyFrameRef.current + 1) % FLY.length;
+            flyFrameRef.current = next;
+            setFlyFrame(next);
+          }
         }
 
-        // 무지개 잔상
+        /* 무지개 잔상 */
         if (ts - lastTrailT > TRAIL_MS) {
           lastTrailT = ts;
           const ci = trailCiRef.current;
@@ -122,17 +147,12 @@ export default function KirbyPet() {
           const born = Date.now();
           setTrails(prev => [
             ...prev.filter(t => born - t.born < 800),
-            {
-              id: ts + Math.random(),
-              x: nx + SIZE / 2, y: ny + SIZE / 2,
-              color: RAINBOW[ci],
-              size: Math.random() * 14 + 8,
-              born,
-            },
+            { id: ts + Math.random(), x: nx + SIZE / 2, y: ny + SIZE / 2,
+              color: RAINBOW[ci], size: Math.random() * 14 + 8, born },
           ].slice(-16));
         }
 
-        // 랜덤 방향 전환
+        /* 랜덤 방향 전환 */
         if (ts - lastDirT > DIR_CHANGE_MS) {
           lastDirT = ts;
           if (Math.random() < 0.5) {
@@ -140,13 +160,15 @@ export default function KirbyPet() {
             dirRef.current = { x: Math.cos(angle), y: Math.sin(angle) * 0.6 };
           }
         }
+
       } else {
-        // 호버 중: eat 애니메이션
-        if (ts - lastFrameT > FRAME_MS.eat) {
-          lastFrameT = ts;
-          const next = (frameIdxRef.current + 1) % ANIMS.eat.length;
-          frameIdxRef.current = next;
-          setFrameIdx(next);
+        /* 호버: eat 프레임별 타이밍으로 진행 */
+        const curMs = EAT[eatFrameRef.current].ms;
+        if (ts - lastEatT > curMs) {
+          lastEatT = ts;
+          const next = (eatFrameRef.current + 1) % EAT.length;
+          eatFrameRef.current = next;
+          setEatFrame(next);
         }
       }
 
@@ -157,7 +179,7 @@ export default function KirbyPet() {
     return () => cancelAnimationFrame(rafId);
   }, []);
 
-  // ── 잔소리 타이머 ──
+  // ── 잔소리 타이머 ──────────────────────────────
   useEffect(() => {
     const tick = () => {
       setMsgVisible(false);
@@ -170,7 +192,7 @@ export default function KirbyPet() {
     return () => clearInterval(iv);
   }, []);
 
-  // ── 잔상 정리 ──
+  // ── 잔상 정리 ──────────────────────────────────
   useEffect(() => {
     const iv = setInterval(() => {
       const now = Date.now();
@@ -182,46 +204,36 @@ export default function KirbyPet() {
   const handleMouseEnter = useCallback(() => {
     isHoveredRef.current = true;
     setIsHovered(true);
-    animKeyRef.current = 'eat';
-    setAnimKey('eat');
-    frameIdxRef.current = 0;
-    setFrameIdx(0);
+    eatFrameRef.current = 0;
+    setEatFrame(0);
   }, []);
 
   const handleMouseLeave = useCallback(() => {
     isHoveredRef.current = false;
     setIsHovered(false);
-    const key = dirRef.current.x >= 0 ? 'walkRight' : 'walkLeft';
-    animKeyRef.current = key;
-    setAnimKey(key);
-    frameIdxRef.current = 0;
-    setFrameIdx(0);
   }, []);
 
-  const currentSrc = ANIMS[animKey]?.[frameIdx] ?? ANIMS.walkRight[0];
+  const spriteSrc = isHovered
+    ? EAT[eatFrame].src
+    : moveMode === 'fly'
+      ? FLY[flyFrame]
+      : WALK[walkDir][walkFrame];
 
   return (
     <>
       {/* 🌈 무지개 잔상 */}
       <div className="kirby-trail-layer" aria-hidden="true">
         {trails.map(t => {
-          const age = (Date.now() - t.born) / 800;
+          const age     = (Date.now() - t.born) / 800;
           const opacity = Math.max(0, 1 - age);
           return (
-            <div
-              key={t.id}
-              className="kirby-trail-dot"
-              style={{
-                left:            t.x,
-                top:             t.y,
-                width:           `${t.size}px`,
-                height:          `${t.size}px`,
-                backgroundColor: t.color,
-                opacity,
-                transform:       `translate(-50%,-50%) scale(${0.3 + opacity * 0.7})`,
-                boxShadow:       `0 0 ${t.size * 1.5}px ${t.color}`,
-              }}
-            />
+            <div key={t.id} className="kirby-trail-dot" style={{
+              left: t.x, top: t.y,
+              width: `${t.size}px`, height: `${t.size}px`,
+              backgroundColor: t.color, opacity,
+              transform: `translate(-50%,-50%) scale(${0.3 + opacity * 0.7})`,
+              boxShadow: `0 0 ${t.size * 1.5}px ${t.color}`,
+            }} />
           );
         })}
       </div>
@@ -234,7 +246,7 @@ export default function KirbyPet() {
         onMouseLeave={handleMouseLeave}
         aria-label="화면을 돌아다니는 커비"
       >
-        {/* 💬 픽셀 말풍선 */}
+        {/* 💬 말풍선 */}
         {!isHovered && (
           <div className={`kirby-speech-bubble${msgVisible ? ' kirby-speech-bubble--visible' : ' kirby-speech-bubble--hidden'}`}>
             <span className="kirby-speech-text">{message}</span>
@@ -242,16 +254,16 @@ export default function KirbyPet() {
           </div>
         )}
 
-        {/* 🎮 커비 스프라이트 */}
+        {/* 🎮 스프라이트 */}
         <img
-          src={currentSrc}
+          src={spriteSrc}
           className={`kirby-sprite${isHovered ? ' kirby-sprite--inhaling' : ''}`}
           style={{ width: SIZE, height: SIZE }}
           alt=""
           draggable={false}
         />
 
-        {/* ⭐ 호버 별 이펙트 */}
+        {/* ⭐ 호버 별 */}
         {isHovered && (
           <div className="kirby-stars" aria-hidden="true">
             {['⭐','✨','💫','🌟'].map((star, i) => (
