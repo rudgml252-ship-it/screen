@@ -20,6 +20,10 @@ function extractSyncable(db) {
         presentedCount: s.presentedCount ?? 0,
         stamps: { total: s.stamps.total, weekly: s.stamps.weekly },
       }));
+    } else if (key === 'classInfo') {
+      // teacherPassword는 로컬에만 보관 — Firestore에 평문 노출 방지
+      const { teacherPassword: _omit, ...safeInfo } = db[key];
+      out[key] = safeInfo;
     } else {
       out[key] = db[key];
     }
@@ -44,6 +48,9 @@ function mergeFbData(local, fb) {
           stamps: { ...loc.stamps, total: fbS.stamps.total, weekly: fbS.stamps.weekly },
         };
       });
+    } else if (key === 'classInfo') {
+      // teacherPassword는 Firestore로 보내지 않으므로 로컬 값을 보존
+      merged[key] = { ...fb[key], teacherPassword: local.classInfo?.teacherPassword ?? '' };
     } else {
       merged[key] = fb[key];
     }
