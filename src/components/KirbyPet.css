@@ -52,10 +52,11 @@
   border: 3px solid #3D2B1F;
   border-radius: 0;
   padding: 7px 12px;
-  min-width: 130px;
-  max-width: 200px;
+  min-width: 140px;
+  max-width: 230px;
   text-align: center;
   white-space: normal;
+  word-break: keep-all;
   box-shadow: 3px 3px 0px #3D2B1F;
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.3s ease;
