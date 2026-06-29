@@ -8,7 +8,7 @@ function PrivacyModal({ onClose }) {
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
         <h2 className={styles.modalTitle}>개인정보처리방침</h2>
         <div className={styles.modalContent}>
-          <p className={styles.updated}>최종 수정일: 2026년 6월 1일</p>
+          <p className={styles.updated}>최종 수정일: 2026년 6월 29일</p>
 
           <h3>1. 수집하는 개인정보 항목</h3>
           <p>서비스 운영을 위해 다음 항목을 수집합니다.</p>
@@ -49,7 +49,7 @@ function TermsModal({ onClose }) {
         <button className={styles.closeBtn} onClick={onClose}>✕</button>
         <h2 className={styles.modalTitle}>사용약관</h2>
         <div className={styles.modalContent}>
-          <p className={styles.updated}>최종 수정일: 2026년 6월 1일</p>
+          <p className={styles.updated}>최종 수정일: 2026년 6월 29일</p>
 
           <h3>제1조 (목적)</h3>
           <p>본 약관은 인왕중학교 학급 전자칠판 서비스(이하 "서비스")의 이용 조건 및 절차에 관한 사항을 규정함을 목적으로 합니다.</p>
