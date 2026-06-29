@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useMockDb } from '../context/MockDbContext';
-import TeacherAvatar from '../components/TeacherAvatar';
 import styles from './BoardPage.module.css';
 
 /* ── helpers ── */
@@ -238,9 +237,6 @@ export default function BoardPage() {
 
       {/* ── 배경 ── */}
       <div className={styles.bgBase} />
-
-      {/* ── 선생님 픽셀 아바타 ── */}
-      <TeacherAvatar />
 
       {/* ══ 헤더 ══ */}
       <header className={styles.header}>
