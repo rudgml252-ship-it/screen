@@ -18,22 +18,18 @@ const NAGGING_MESSAGES = [
 ];
 
 // ── 스프라이트 정의 ──────────────────────────────
-const WALK = {
-  right: ['/walk right 1.PNG', '/walk right 2.PNG'],
-  left:  ['/walk left 1.PNG',  '/walk left 2.PNG'],
-};
 const FLY = ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'];
 
 // eat2/eat3: 입 쫙 벌린 흡입 자세 → 오래 유지해서 "와아아아암" 효과
+// eat5: 마지막 프레임(뱉는 모습) → 더 오래 유지
 const EAT = [
   { src: '/eat1.PNG', ms:  80 },   // 입 살짝 벌리기
   { src: '/eat2.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
   { src: '/eat3.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
   { src: '/eat4.PNG', ms: 130 },   // 먹히는 중
-  { src: '/eat5.PNG', ms: 130 },   // 삼킨 후
+  { src: '/eat5.PNG', ms: 900 },   // 뱉는 모습 ← 더 오래 유지
 ];
 
-const WALK_MS = 120;
 const FLY_MS  = 130;
 const SIZE    = 96;
 
@@ -44,31 +40,27 @@ const RAINBOW = [
 ];
 
 // 전체 이미지 프리로드
-[...WALK.right, ...WALK.left, ...FLY, ...EAT.map(e => e.src)].forEach(src => {
+[...FLY, ...EAT.map(e => e.src)].forEach(src => {
   const img = new Image(); img.src = src;
 });
 
 export default function KirbyPet() {
-  const [pos,        setPos]        = useState({ x: 200, y: 200 });
-  const [walkDir,    setWalkDir]    = useState('right');   // 'right' | 'left'
-  const [moveMode,   setMoveMode]   = useState('walk');    // 'walk' | 'fly'
-  const [walkFrame,  setWalkFrame]  = useState(0);         // 0-1, 방향 바뀌어도 유지
-  const [flyFrame,   setFlyFrame]   = useState(0);         // 0-3
-  const [eatFrame,   setEatFrame]   = useState(0);         // 0-4
-  const [isHovered,  setIsHovered]  = useState(false);
-  const [message,    setMessage]    = useState(NAGGING_MESSAGES[0]);
-  const [msgVisible, setMsgVisible] = useState(true);
-  const [trails,     setTrails]     = useState([]);
+  const [pos,         setPos]         = useState({ x: 200, y: 200 });
+  const [facingLeft,  setFacingLeft]  = useState(false);
+  const [flyFrame,    setFlyFrame]    = useState(0);         // 0-3
+  const [eatFrame,    setEatFrame]    = useState(0);         // 0-4
+  const [isHovered,   setIsHovered]   = useState(false);
+  const [message,     setMessage]     = useState(NAGGING_MESSAGES[0]);
+  const [msgVisible,  setMsgVisible]  = useState(true);
+  const [trails,      setTrails]      = useState([]);
 
-  const posRef       = useRef({ x: 200, y: 200 });
-  const dirRef       = useRef({ x: 1, y: 0.4 });
-  const isHoveredRef = useRef(false);
-  const walkDirRef   = useRef('right');
-  const moveModeRef  = useRef('walk');
-  const walkFrameRef = useRef(0);  // ← 절대 방향 전환 시 리셋 안 함
-  const flyFrameRef  = useRef(0);
-  const eatFrameRef  = useRef(0);
-  const trailCiRef   = useRef(0);
+  const posRef        = useRef({ x: 200, y: 200 });
+  const dirRef        = useRef({ x: 1, y: 0.4 });
+  const isHoveredRef  = useRef(false);
+  const facingLeftRef = useRef(false);
+  const flyFrameRef   = useRef(0);
+  const eatFrameRef   = useRef(0);
+  const trailCiRef    = useRef(0);
 
   // ── 메인 루프 ──────────────────────────────────
   useEffect(() => {
@@ -76,7 +68,6 @@ export default function KirbyPet() {
     const TRAIL_MS      = 90;
     const DIR_CHANGE_MS = 3500;
 
-    let lastWalkT  = 0;
     let lastFlyT   = 0;
     let lastEatT   = 0;
     let lastTrailT = 0;
@@ -108,35 +99,17 @@ export default function KirbyPet() {
         posRef.current = { x: nx, y: ny };
         setPos({ x: nx, y: ny });
 
-        /* 수직 이동이면 fly, 수평이면 walk (walkFrame 은 절대 리셋 안 함) */
-        const absX = Math.abs(dirRef.current.x);
-        const absY = Math.abs(dirRef.current.y);
-        const newMode = absY > absX * 1.2 ? 'fly' : 'walk';
-        if (newMode !== moveModeRef.current) {
-          moveModeRef.current = newMode;
-          setMoveMode(newMode);
+        /* 항상 fly 모션. 좌우 방향만 갱신해서 스프라이트를 좌우 반전 */
+        const newFacingLeft = dirRef.current.x < 0;
+        if (newFacingLeft !== facingLeftRef.current) {
+          facingLeftRef.current = newFacingLeft;
+          setFacingLeft(newFacingLeft);
         }
-
-        /* 걷기 방향 갱신 (walkFrame 은 그대로 이어감) */
-        if (newMode === 'walk') {
-          const newDir = dirRef.current.x >= 0 ? 'right' : 'left';
-          if (newDir !== walkDirRef.current) {
-            walkDirRef.current = newDir;
-            setWalkDir(newDir);
-          }
-          if (ts - lastWalkT > WALK_MS) {
-            lastWalkT = ts;
-            const next = (walkFrameRef.current + 1) % WALK[walkDirRef.current].length;
-            walkFrameRef.current = next;
-            setWalkFrame(next);
-          }
-        } else {
-          if (ts - lastFlyT > FLY_MS) {
-            lastFlyT = ts;
-            const next = (flyFrameRef.current + 1) % FLY.length;
-            flyFrameRef.current = next;
-            setFlyFrame(next);
-          }
+        if (ts - lastFlyT > FLY_MS) {
+          lastFlyT = ts;
+          const next = (flyFrameRef.current + 1) % FLY.length;
+          flyFrameRef.current = next;
+          setFlyFrame(next);
         }
 
         /* 무지개 잔상 */
@@ -213,11 +186,7 @@ export default function KirbyPet() {
     setIsHovered(false);
   }, []);
 
-  const spriteSrc = isHovered
-    ? EAT[eatFrame].src
-    : moveMode === 'fly'
-      ? FLY[flyFrame]
-      : WALK[walkDir][walkFrame];
+  const spriteSrc = isHovered ? EAT[eatFrame].src : FLY[flyFrame];
 
   return (
     <>
@@ -258,7 +227,10 @@ export default function KirbyPet() {
         <img
           src={spriteSrc}
           className={`kirby-sprite${isHovered ? ' kirby-sprite--inhaling' : ''}`}
-          style={{ width: SIZE, height: SIZE }}
+          style={{
+            width: SIZE, height: SIZE,
+            transform: !isHovered && facingLeft ? 'scaleX(-1)' : 'none',
+          }}
           alt=""
           draggable={false}
         />
