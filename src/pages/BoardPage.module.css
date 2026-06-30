@@ -193,7 +193,25 @@
   padding-bottom: 6px;
   border-bottom: 2px dashed #FFCCD6;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
+
+/* ─── 글씨 크기 조절 버튼 ─── */
+.fontScaleCtrl { display: flex; align-items: center; gap: 4px; }
+.fontScaleBtn {
+  width: 22px; height: 22px;
+  display: flex; align-items: center; justify-content: center;
+  background: #FFF0F4; border: 1.5px solid #FFCCD6; border-radius: 6px;
+  color: #D94F72; font-size: 13px; font-weight: 900;
+  cursor: pointer; line-height: 1; padding: 0;
+  transition: background 0.15s;
+}
+.fontScaleBtn:hover { background: #FFD6E0; }
+.fontScaleBtn:disabled { opacity: 0.35; cursor: default; }
+.fontScaleLabel { font-size: 10px; color: #A8849A; min-width: 28px; text-align: center; }
 
 .empty { color: #FFAABF; font-size: 14px; text-align: center; padding: 16px; }
 
@@ -325,10 +343,10 @@
   display: flex; flex-direction: column; align-items: center;
   gap: 8px; flex: 1; justify-content: center; padding: 8px;
 }
-.eduEmoji { font-size: 40px; }
-.eduTitle { font-size: 18px; font-weight: 800; color: #3D1A2A; }
+.eduEmoji { font-size: calc(40px * var(--edu-scale, 1)); }
+.eduTitle { font-size: calc(18px * var(--edu-scale, 1)); font-weight: 800; color: #3D1A2A; }
 .eduBody {
-  font-size: 14px; color: #D94F72;
+  font-size: calc(14px * var(--edu-scale, 1)); color: #D94F72;
   white-space: pre-line; line-height: 1.6; max-width: 90%;
 }
 
@@ -349,10 +367,10 @@
   color: white; flex-shrink: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.12);
 }
-.eduRichEmoji { font-size: 36px; flex-shrink: 0; }
+.eduRichEmoji { font-size: calc(36px * var(--edu-scale, 1)); flex-shrink: 0; }
 .eduRichHeaderText { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-.eduRichTitle { font-size: 19px; font-weight: 900; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.eduRichMsg { font-size: 12px; opacity: 0.95; line-height: 1.3; font-weight: 500; }
+.eduRichTitle { font-size: calc(19px * var(--edu-scale, 1)); font-weight: 900; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.eduRichMsg { font-size: calc(12px * var(--edu-scale, 1)); opacity: 0.95; line-height: 1.3; font-weight: 500; }
 
 /* 섹션 목록 — 가용 공간을 균등하게 나눔, 스크롤 없음 */
 .eduRichSections {
@@ -376,7 +394,7 @@
   border: 1.5px solid rgba(0,0,0,0.06);
 }
 .eduSecTitle {
-  font-size: 15px; font-weight: 800; color: #B5274A;
+  font-size: calc(15px * var(--edu-scale, 1)); font-weight: 800; color: #B5274A;
   margin-bottom: 2px; flex-shrink: 0;
   letter-spacing: -0.2px;
 }
@@ -387,7 +405,7 @@
   flex: 1; min-height: 0; overflow: hidden;
 }
 .eduSecList li {
-  font-size: 14px; color: #1E1020; line-height: 1.45;
+  font-size: calc(14px * var(--edu-scale, 1)); color: #1E1020; line-height: 1.45;
   font-weight: 500;
 }
 
@@ -402,15 +420,15 @@
   text-align: center;
   display: flex; flex-direction: column; align-items: center; gap: 1px;
 }
-.eduStatEmoji { font-size: 14px; }
-.eduStatValue { font-size: 12px; font-weight: 900; color: #E84570; }
-.eduStatLabel { font-size: 9px; color: #7D6575; line-height: 1.3; }
+.eduStatEmoji { font-size: calc(14px * var(--edu-scale, 1)); }
+.eduStatValue { font-size: calc(12px * var(--edu-scale, 1)); font-weight: 900; color: #E84570; }
+.eduStatLabel { font-size: calc(9px * var(--edu-scale, 1)); color: #7D6575; line-height: 1.3; }
 
 .eduHighlight {
   background: linear-gradient(135deg, #FFF0F4, #FFCCD6);
   border-left: 4px solid #FF5673;
   padding: 6px 12px; border-radius: 10px;
-  font-size: 13px; font-weight: 700; color: #C03060;
+  font-size: calc(13px * var(--edu-scale, 1)); font-weight: 700; color: #C03060;
   flex-shrink: 0; line-height: 1.45;
 }
 

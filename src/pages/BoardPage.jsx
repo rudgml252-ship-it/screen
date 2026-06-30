@@ -195,6 +195,17 @@ export default function BoardPage() {
     return () => clearInterval(t);
   }, [eduCards.length]);
 
+  /* ── 오늘의 교육 글씨 크기 조절 (이 기기에 저장) ── */
+  const [eduScale, setEduScale] = useState(() => {
+    const saved = parseFloat(localStorage.getItem('edu_font_scale'));
+    return Number.isFinite(saved) ? saved : 1;
+  });
+  useEffect(() => { localStorage.setItem('edu_font_scale', String(eduScale)); }, [eduScale]);
+  const EDU_SCALE_MIN = 0.7, EDU_SCALE_MAX = 1.6, EDU_SCALE_STEP = 0.1;
+  const adjustEduScale = (delta) => {
+    setEduScale(s => Math.round(Math.min(EDU_SCALE_MAX, Math.max(EDU_SCALE_MIN, s + delta)) * 10) / 10);
+  };
+
   /* ── 학급 사진 (6s 회전) ── */
   const visiblePhotos = (db.photos || []).filter(p => p.visible);
   useEffect(() => {
@@ -300,8 +311,15 @@ export default function BoardPage() {
         </section>
 
         {/* ── 가운데: 오늘의 교육 (전체) ── */}
-        <section className={`${styles.panel} ${styles.eduPanel}`}>
-          <div className={styles.panelTitle}>📚 오늘의 교육</div>
+        <section className={`${styles.panel} ${styles.eduPanel}`} style={{ '--edu-scale': eduScale }}>
+          <div className={styles.panelTitle}>
+            <span>📚 오늘의 교육</span>
+            <div className={styles.fontScaleCtrl}>
+              <button className={styles.fontScaleBtn} onClick={() => adjustEduScale(-EDU_SCALE_STEP)} disabled={eduScale <= EDU_SCALE_MIN} title="글씨 작게">가-</button>
+              <span className={styles.fontScaleLabel}>{Math.round(eduScale * 100)}%</span>
+              <button className={styles.fontScaleBtn} onClick={() => adjustEduScale(EDU_SCALE_STEP)} disabled={eduScale >= EDU_SCALE_MAX} title="글씨 크게">가+</button>
+            </div>
+          </div>
           {currentEdu
             ? <EduCard data={currentEdu} />
             : <div className={styles.empty}>📖 교육 자료가 없어요.</div>
