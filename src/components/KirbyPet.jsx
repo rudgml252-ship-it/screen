@@ -25,10 +25,13 @@ const FLY = ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'];
 const EAT = [
   { src: '/eat1.PNG', ms:  220 },   // 입 살짝 벌리기
   { src: '/eat2.PNG', ms: 1600 },   // 입 제일 크게 벌리기 ← 제일 오래 유지
-  { src: '/eat3.PNG', ms:  750 },   // 와아아아암! ← 오래 유지
+  { src: '/eat3.PNG', ms: 3200 },   // 와아아아암! ← 가장 오래 유지
   { src: '/eat4.PNG', ms:  350 },   // 먹히는 중
   { src: '/eat5.PNG', ms: 1400 },   // 뱉는 모습 ← 더 오래 유지
 ];
+
+// 흡입 단계(1~3번 프레임) 총 길이 → 효과음 길이를 여기에 맞춤
+const INHALE_MS = EAT[0].ms + EAT[1].ms + EAT[2].ms;
 
 const FLY_MS  = 130;
 const SIZE    = 96;
@@ -175,6 +178,7 @@ export default function KirbyPet() {
   }, []);
 
   // ── 흡입 효과음 (합성, 외부 파일 불필요) ──────────
+  // 흡입 단계(1~3번 프레임, INHALE_MS) 내내 지속되는 "휴우우웅~" 소리 + 끝나는 순간 "꿀꺽" 소리
   const audioCtxRef = useRef(null);
   const playInhaleSound = useCallback(() => {
     try {
@@ -184,31 +188,48 @@ export default function KirbyPet() {
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
 
-      const now  = ctx.currentTime;
+      const now       = ctx.currentTime;
+      const inhaleSec = INHALE_MS / 1000;
+
+      // 메인 흡입음: 점점 높아지는 피치 + 귀여운 떨림(비브라토)
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(180, now);
-      osc.frequency.exponentialRampToValueAtTime(900, now + 0.45);
+      osc.frequency.setValueAtTime(170, now);
+      osc.frequency.exponentialRampToValueAtTime(680, now + inhaleSec * 0.92);
+
+      const lfo = ctx.createOscillator();
+      const lfoGain = ctx.createGain();
+      lfo.type = 'sine';
+      lfo.frequency.setValueAtTime(7, now);
+      lfoGain.gain.setValueAtTime(18, now);
+      lfo.connect(lfoGain).connect(osc.frequency);
+
+      const sustainAt = now + Math.max(0.13, inhaleSec - 0.15);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.08);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+      gain.gain.exponentialRampToValueAtTime(0.2, now + 0.12);
+      gain.gain.setValueAtTime(0.2, sustainAt);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + inhaleSec);
+
       osc.connect(gain).connect(ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.52);
+      lfo.start(now);
+      osc.stop(now + inhaleSec + 0.05);
+      lfo.stop(now + inhaleSec + 0.05);
 
-      // 살짝 뒤따르는 "뽁" 소리
-      const pop = ctx.createOscillator();
+      // 흡입이 끝나는 순간 "꿀꺽" 삼키는 소리
+      const popAt   = now + inhaleSec;
+      const pop     = ctx.createOscillator();
       const popGain = ctx.createGain();
       pop.type = 'triangle';
-      pop.frequency.setValueAtTime(700, now + 0.45);
-      pop.frequency.exponentialRampToValueAtTime(300, now + 0.58);
-      popGain.gain.setValueAtTime(0.0001, now + 0.45);
-      popGain.gain.exponentialRampToValueAtTime(0.18, now + 0.47);
-      popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+      pop.frequency.setValueAtTime(700, popAt);
+      pop.frequency.exponentialRampToValueAtTime(280, popAt + 0.16);
+      popGain.gain.setValueAtTime(0.0001, popAt);
+      popGain.gain.exponentialRampToValueAtTime(0.2, popAt + 0.02);
+      popGain.gain.exponentialRampToValueAtTime(0.0001, popAt + 0.2);
       pop.connect(popGain).connect(ctx.destination);
-      pop.start(now + 0.45);
-      pop.stop(now + 0.62);
+      pop.start(popAt);
+      pop.stop(popAt + 0.22);
     } catch {
       // 오디오 미지원 환경은 무시
     }
