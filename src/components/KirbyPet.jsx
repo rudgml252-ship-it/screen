@@ -24,7 +24,7 @@ const FLY = ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'];
 // eat5: 마지막 프레임(뱉는 모습) → 더 오래 유지
 const EAT = [
   { src: '/eat1.PNG', ms:  220 },   // 입 살짝 벌리기
-  { src: '/eat2.PNG', ms:  750 },   // 와아아아암! ← 오래 유지
+  { src: '/eat2.PNG', ms: 1600 },   // 입 제일 크게 벌리기 ← 제일 오래 유지
   { src: '/eat3.PNG', ms:  750 },   // 와아아아암! ← 오래 유지
   { src: '/eat4.PNG', ms:  350 },   // 먹히는 중
   { src: '/eat5.PNG', ms: 1400 },   // 뱉는 모습 ← 더 오래 유지
@@ -174,12 +174,53 @@ export default function KirbyPet() {
     return () => clearInterval(iv);
   }, []);
 
+  // ── 흡입 효과음 (합성, 외부 파일 불필요) ──────────
+  const audioCtxRef = useRef(null);
+  const playInhaleSound = useCallback(() => {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      if (!audioCtxRef.current) audioCtxRef.current = new Ctx();
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') ctx.resume();
+
+      const now  = ctx.currentTime;
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(180, now);
+      osc.frequency.exponentialRampToValueAtTime(900, now + 0.45);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.exponentialRampToValueAtTime(0.22, now + 0.08);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.5);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.52);
+
+      // 살짝 뒤따르는 "뽁" 소리
+      const pop = ctx.createOscillator();
+      const popGain = ctx.createGain();
+      pop.type = 'triangle';
+      pop.frequency.setValueAtTime(700, now + 0.45);
+      pop.frequency.exponentialRampToValueAtTime(300, now + 0.58);
+      popGain.gain.setValueAtTime(0.0001, now + 0.45);
+      popGain.gain.exponentialRampToValueAtTime(0.18, now + 0.47);
+      popGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.6);
+      pop.connect(popGain).connect(ctx.destination);
+      pop.start(now + 0.45);
+      pop.stop(now + 0.62);
+    } catch {
+      // 오디오 미지원 환경은 무시
+    }
+  }, []);
+
   const handleMouseEnter = useCallback(() => {
     isHoveredRef.current = true;
     setIsHovered(true);
     eatFrameRef.current = 0;
     setEatFrame(0);
-  }, []);
+    playInhaleSound();
+  }, [playInhaleSound]);
 
   const handleMouseLeave = useCallback(() => {
     isHoveredRef.current = false;
