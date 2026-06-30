@@ -178,8 +178,34 @@ export default function KirbyPet() {
   }, []);
 
   // ── 흡입 효과음 (합성, 외부 파일 불필요) ──────────
-  // 흡입 단계(1~3번 프레임, INHALE_MS) 내내 지속되는 "휴우우웅~" 소리 + 끝나는 순간 "꿀꺽" 소리
-  const audioCtxRef = useRef(null);
+  // 흡입 단계(1~3번 프레임, INHALE_MS) 내내 지속되는 밝고 귀여운 허밍 + 끝나는 순간 "꿀꺽" 소리
+  // 마우스를 떼면 stopInhaleSound 로 즉시 끊는다.
+  const audioCtxRef   = useRef(null);
+  const soundNodesRef = useRef(null);
+
+  const stopInhaleSound = useCallback(() => {
+    const ctx = audioCtxRef.current;
+    const nodes = soundNodesRef.current;
+    if (!ctx || !nodes) return;
+    const now = ctx.currentTime;
+    try {
+      [nodes.gain, nodes.harmGain].forEach(g => {
+        g.gain.cancelScheduledValues(now);
+        g.gain.setValueAtTime(g.gain.value, now);
+        g.gain.exponentialRampToValueAtTime(0.0001, now + 0.05);
+      });
+      nodes.osc.stop(now + 0.07);
+      nodes.lfo.stop(now + 0.07);
+      nodes.harm.stop(now + 0.07);
+      nodes.popGain.gain.cancelScheduledValues(now);
+      nodes.popGain.gain.setValueAtTime(0.0001, now);
+      nodes.pop.stop(now + 0.01);
+    } catch {
+      // 이미 멈춘 노드면 무시
+    }
+    soundNodesRef.current = null;
+  }, []);
+
   const playInhaleSound = useCallback(() => {
     try {
       const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -187,35 +213,49 @@ export default function KirbyPet() {
       if (!audioCtxRef.current) audioCtxRef.current = new Ctx();
       const ctx = audioCtxRef.current;
       if (ctx.state === 'suspended') ctx.resume();
+      stopInhaleSound();
 
       const now       = ctx.currentTime;
       const inhaleSec = INHALE_MS / 1000;
+      const sustainAt = now + Math.max(0.4, inhaleSec - 0.15);
 
-      // 메인 흡입음: 점점 높아지는 피치 + 귀여운 떨림(비브라토)
+      // 메인 허밍: 밝은 음역대에서 살짝 위로 올라간 뒤 부드럽게 유지 (낮은 음역 사이렌 X)
       const osc  = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(170, now);
-      osc.frequency.exponentialRampToValueAtTime(680, now + inhaleSec * 0.92);
+      osc.frequency.setValueAtTime(340, now);
+      osc.frequency.linearRampToValueAtTime(440, now + 0.35);
 
       const lfo = ctx.createOscillator();
       const lfoGain = ctx.createGain();
       lfo.type = 'sine';
-      lfo.frequency.setValueAtTime(7, now);
-      lfoGain.gain.setValueAtTime(18, now);
+      lfo.frequency.setValueAtTime(9, now);
+      lfoGain.gain.setValueAtTime(7, now);
       lfo.connect(lfoGain).connect(osc.frequency);
 
-      const sustainAt = now + Math.max(0.13, inhaleSec - 0.15);
       gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.exponentialRampToValueAtTime(0.2, now + 0.12);
-      gain.gain.setValueAtTime(0.2, sustainAt);
+      gain.gain.exponentialRampToValueAtTime(0.14, now + 0.15);
+      gain.gain.setValueAtTime(0.14, sustainAt);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + inhaleSec);
-
       osc.connect(gain).connect(ctx.destination);
       osc.start(now);
       lfo.start(now);
       osc.stop(now + inhaleSec + 0.05);
       lfo.stop(now + inhaleSec + 0.05);
+
+      // 옥타브 위 배음을 살짝 얹어 더 귀엽고 통통 튀는 느낌 추가
+      const harm = ctx.createOscillator();
+      const harmGain = ctx.createGain();
+      harm.type = 'triangle';
+      harm.frequency.setValueAtTime(680, now);
+      harm.frequency.linearRampToValueAtTime(880, now + 0.35);
+      harmGain.gain.setValueAtTime(0.0001, now);
+      harmGain.gain.exponentialRampToValueAtTime(0.05, now + 0.15);
+      harmGain.gain.setValueAtTime(0.05, sustainAt);
+      harmGain.gain.exponentialRampToValueAtTime(0.0001, now + inhaleSec);
+      harm.connect(harmGain).connect(ctx.destination);
+      harm.start(now);
+      harm.stop(now + inhaleSec + 0.05);
 
       // 흡입이 끝나는 순간 "꿀꺽" 삼키는 소리
       const popAt   = now + inhaleSec;
@@ -230,10 +270,12 @@ export default function KirbyPet() {
       pop.connect(popGain).connect(ctx.destination);
       pop.start(popAt);
       pop.stop(popAt + 0.22);
+
+      soundNodesRef.current = { osc, lfo, gain, harm, harmGain, pop, popGain };
     } catch {
       // 오디오 미지원 환경은 무시
     }
-  }, []);
+  }, [stopInhaleSound]);
 
   const handleMouseEnter = useCallback(() => {
     isHoveredRef.current = true;
@@ -246,7 +288,8 @@ export default function KirbyPet() {
   const handleMouseLeave = useCallback(() => {
     isHoveredRef.current = false;
     setIsHovered(false);
-  }, []);
+    stopInhaleSound();
+  }, [stopInhaleSound]);
 
   const spriteSrc = isHovered ? EAT[eatFrame].src : FLY[flyFrame];
 
