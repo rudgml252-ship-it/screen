@@ -23,11 +23,11 @@ const FLY = ['/fly1.PNG', '/fly2.PNG', '/fly3.PNG', '/fly4.PNG'];
 // eat2/eat3: 입 쫙 벌린 흡입 자세 → 오래 유지해서 "와아아아암" 효과
 // eat5: 마지막 프레임(뱉는 모습) → 더 오래 유지
 const EAT = [
-  { src: '/eat1.PNG', ms:  80 },   // 입 살짝 벌리기
-  { src: '/eat2.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
-  { src: '/eat3.PNG', ms: 350 },   // 와아아아암! ← 오래 유지
-  { src: '/eat4.PNG', ms: 130 },   // 먹히는 중
-  { src: '/eat5.PNG', ms: 900 },   // 뱉는 모습 ← 더 오래 유지
+  { src: '/eat1.PNG', ms:  220 },   // 입 살짝 벌리기
+  { src: '/eat2.PNG', ms:  750 },   // 와아아아암! ← 오래 유지
+  { src: '/eat3.PNG', ms:  750 },   // 와아아아암! ← 오래 유지
+  { src: '/eat4.PNG', ms:  350 },   // 먹히는 중
+  { src: '/eat5.PNG', ms: 1400 },   // 뱉는 모습 ← 더 오래 유지
 ];
 
 const FLY_MS  = 130;
