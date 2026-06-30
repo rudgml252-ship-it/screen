@@ -35,7 +35,7 @@ function PrivacyModal({ onClose }) {
           <p>학생 및 보호자는 언제든지 개인정보 열람, 정정, 삭제를 요청할 수 있으며, 담당 교사에게 문의하시기 바랍니다.</p>
 
           <h3>6. 문의</h3>
-          <p>개인정보 관련 문의는 담당 교사에게 직접 문의하시기 바랍니다.</p>
+          <p>개인정보 관련 문의: 인왕중학교 안경희 선생님</p>
         </div>
       </div>
     </div>
@@ -77,7 +77,7 @@ function TermsModal({ onClose }) {
           <p>약관이 변경될 경우 서비스 내 공지를 통해 안내합니다. 변경된 약관은 공지 후 7일이 지난 시점부터 효력이 발생합니다.</p>
 
           <h3>제6조 (문의)</h3>
-          <p>서비스 관련 문의는 담당 교사에게 직접 문의하시기 바랍니다.</p>
+          <p>서비스 관련 문의: 인왕중학교 안경희 선생님</p>
         </div>
       </div>
     </div>
@@ -91,7 +91,7 @@ export default function Footer() {
   return (
     <>
       <footer className={styles.footer}>
-        <span className={styles.credit}>© 모두의 학급</span>
+        <span className={styles.credit}>© 인왕중학교 안경희</span>
         <span className={styles.sep}>·</span>
         <button className={styles.link} onClick={() => setShowPrivacy(true)}>개인정보처리방침</button>
         <span className={styles.sep}>·</span>
